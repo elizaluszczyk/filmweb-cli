@@ -7,8 +7,8 @@ from .cast import CastMember
 
 class SearchHit(BaseModel):
     id: int
-    matched_title: str = Field(alias="matchedTitle")
-    matched_lang: str = Field(alias="matchedLang")
+    matched_title: str | None = Field(default=None, alias="matchedTitle")
+    matched_lang: str | None = Field(default=None, alias="matchedLang")
     film_main_cast: list[CastMember] | None = Field(default=None, alias="filmMainCast")
 
 
