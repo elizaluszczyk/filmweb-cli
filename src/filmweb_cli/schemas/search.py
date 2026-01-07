@@ -10,7 +10,7 @@ class SearchHit(BaseModel):
     type: Literal["film", "serial"]
     matched_title: str = Field(alias="matchedTitle")
     matched_lang: str = Field(alias="matchedLang")
-    film_main_cast: list[CastMember] = Field(alias="filmMainCast")
+    film_main_cast: list[CastMember] | None = Field(default=None, alias="filmMainCast")
 
 
 class SearchResponse(BaseModel):
