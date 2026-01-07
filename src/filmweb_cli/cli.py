@@ -11,16 +11,33 @@ def main(ctx: click.Context) -> None:
     ctx.obj = client
 
 
-@main.command("search")
+@main.group("search")
+def search() -> None:
+    pass
+
+
+@search.command("film")
 @click.argument("query")
 @click.pass_obj
-def search(client: FilmwebClient, query: str) -> None:
+def film(client: FilmwebClient, query: str) -> None:
     search_service = SearchService(client)
 
-    search_results = search_service.search(query)
+    search_film_results = search_service.search_film(query)
 
-    for result in search_results.search_hits:
-        click.echo(result)
+    for film in search_film_results.search_hits:
+        click.echo(film.matched_title)
+
+
+@search.command("series")
+@click.argument("query")
+@click.pass_obj
+def series(client: FilmwebClient, query: str) -> None:
+    search_service = SearchService(client)
+
+    search_series_results = search_service.search_series(query)
+
+    for series in search_series_results.search_hits:
+        click.echo(series.matched_title)
 
 
 if __name__ == "__main__":
