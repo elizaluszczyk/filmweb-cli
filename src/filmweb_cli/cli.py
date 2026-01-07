@@ -40,5 +40,41 @@ def series(client: FilmwebClient, query: str) -> None:
         click.echo(series.matched_title)
 
 
+@search.command("character")
+@click.argument("query")
+@click.pass_obj
+def character(client: FilmwebClient, query: str) -> None:
+    search_service = SearchService(client)
+
+    search_character_results = search_service.search_character(query)
+
+    for character in search_character_results.search_hits:
+        click.echo(character.matched_name)
+
+
+@search.command("person")
+@click.argument("query")
+@click.pass_obj
+def person(client: FilmwebClient, query: str) -> None:
+    search_service = SearchService(client)
+
+    search_person_results = search_service.search_person(query)
+
+    for person in search_person_results.search_hits:
+        click.echo(person)
+
+
+@search.command("game")
+@click.argument("query")
+@click.pass_obj
+def game(client: FilmwebClient, query: str) -> None:
+    search_service = SearchService(client)
+
+    search_game_results = search_service.search_game(query)
+
+    for game in search_game_results.search_hits:
+        click.echo(game.matched_title)
+
+
 if __name__ == "__main__":
     main()
