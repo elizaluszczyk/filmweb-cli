@@ -13,6 +13,19 @@ class SearchHit(BaseModel):
     film_main_cast: list[CastMember] | None = Field(default=None, alias="filmMainCast")
 
 
-class SearchResponse(BaseModel):
+class SearchFilmHit(SearchHit):
+    type: Literal["film"]
+
+
+class SearchSeriesHit(SearchHit):
+    type: Literal["serial"]
+
+
+class SearchFilmResponse(BaseModel):
     total: int
-    search_hits: list[SearchHit] = Field(alias="searchHits")
+    search_hits: list[SearchFilmHit] = Field(alias="searchHits")
+
+
+class SearchSeriesResponse(BaseModel):
+    total: int
+    search_hits: list[SearchSeriesHit] = Field(alias="searchHits")
