@@ -7,7 +7,7 @@ from filmweb_cli.schemas.search import (
     SearchSeriesHit,
 )
 
-SEARCH_ENDPOINTS: dict[SearchHit, str] = {
+SEARCH_ENDPOINTS: dict[type[SearchHit], str] = {
     SearchFilmHit: "/films/search",
     SearchSeriesHit: "/serials/search",
     SearchCharacterHit: "/characters/search",
