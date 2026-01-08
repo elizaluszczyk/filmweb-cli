@@ -1,14 +1,15 @@
 import click
 
+from .cli_config import SEARCH_COMMAND
 from .client import FilmwebClient
+from .schemas.search import SearchHit
 from .services.search_service import SearchService
 
 
 @click.group()
 @click.pass_context
 def main(ctx: click.Context) -> None:
-    client = FilmwebClient()
-    ctx.obj = client
+    ctx.obj = FilmwebClient()
 
 
 @main.group("search")
@@ -16,64 +17,23 @@ def search() -> None:
     pass
 
 
-@search.command("film")
-@click.argument("query")
-@click.pass_obj
-def film(client: FilmwebClient, query: str) -> None:
-    search_service = SearchService(client)
+def make_search_command(hit_type: SearchHit) -> None:
 
-    search_film_results = search_service.search_film(query)
+    @click.argument("query")
+    @click.pass_obj
+    def command(client: FilmwebClient, query: str) -> None:
+        search_service = SearchService(client)
 
-    for film in search_film_results.search_hits:
-        click.echo(film.matched_title)
+        search_results = search_service.search(query, hit_type)
 
+        for result in search_results.search_hits:
+            click.echo(result.matched_title or "no title")
 
-@search.command("series")
-@click.argument("query")
-@click.pass_obj
-def series(client: FilmwebClient, query: str) -> None:
-    search_service = SearchService(client)
-
-    search_series_results = search_service.search_series(query)
-
-    for series in search_series_results.search_hits:
-        click.echo(series.matched_title)
+    return command
 
 
-@search.command("character")
-@click.argument("query")
-@click.pass_obj
-def character(client: FilmwebClient, query: str) -> None:
-    search_service = SearchService(client)
-
-    search_character_results = search_service.search_character(query)
-
-    for character in search_character_results.search_hits:
-        click.echo(character.matched_name)
-
-
-@search.command("person")
-@click.argument("query")
-@click.pass_obj
-def person(client: FilmwebClient, query: str) -> None:
-    search_service = SearchService(client)
-
-    search_person_results = search_service.search_person(query)
-
-    for person in search_person_results.search_hits:
-        click.echo(person)
-
-
-@search.command("game")
-@click.argument("query")
-@click.pass_obj
-def game(client: FilmwebClient, query: str) -> None:
-    search_service = SearchService(client)
-
-    search_game_results = search_service.search_game(query)
-
-    for game in search_game_results.search_hits:
-        click.echo(game.matched_title)
+for name, hit_type in SEARCH_COMMAND.items():
+    search.command(name)(make_search_command(hit_type))
 
 
 if __name__ == "__main__":
