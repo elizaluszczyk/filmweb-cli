@@ -11,6 +11,9 @@ class SearchHit(BaseModel):
     matched_lang: str | None = Field(default=None, alias="matchedLang")
     film_main_cast: list[CastMember] | None = Field(default=None, alias="filmMainCast")
 
+    def display_name(self) -> str:
+        return self.matched_title or self.id
+
 
 class SearchFilmHit(SearchHit):
     type: Literal["film"]
@@ -27,6 +30,9 @@ class SearchGameHit(SearchHit):
 class SearchCharacterHit(SearchHit):
     type: Literal["character"]
     matched_name: str = Field(alias="matchedName")
+
+    def display_name(self) -> str:
+        return self.matched_name
 
 
 class SearchPersonHit(SearchHit):
