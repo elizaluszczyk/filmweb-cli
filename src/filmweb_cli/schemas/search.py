@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Generic, Literal, TypeVar
 
 from pydantic import BaseModel, Field
 
@@ -33,25 +33,9 @@ class SearchPersonHit(SearchHit):
     type: Literal["person"]
 
 
-class SearchResponse(BaseModel):
+T = TypeVar("T", bound=SearchHit)
+
+
+class SearchResponse(BaseModel, Generic[T]):
     total: int
-
-
-class SearchFilmResponse(SearchResponse):
-    search_hits: list[SearchFilmHit] = Field(alias="searchHits")
-
-
-class SearchSeriesResponse(SearchResponse):
-    search_hits: list[SearchSeriesHit] = Field(alias="searchHits")
-
-
-class SearchCharacterResponse(SearchResponse):
-    search_hits: list[SearchCharacterHit] = Field(alias="searchHits")
-
-
-class SearchPersonResponse(SearchResponse):
-    search_hits: list[SearchPersonHit] = Field(alias="searchHits")
-
-
-class SearchGameResponse(SearchResponse):
-    search_hits: list[SearchGameHit] = Field(alias="searchHits")
+    search_hits: list[T] = Field(alias="searchHits")
