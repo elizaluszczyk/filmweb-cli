@@ -12,7 +12,7 @@ class SearchHit(BaseModel):
     film_main_cast: list[CastMember] | None = Field(default=None, alias="filmMainCast")
 
     def display_name(self) -> str:
-        return self.matched_title or self.id
+        return self.matched_title or str(self.id)
 
 
 class SearchFilmHit(SearchHit):
