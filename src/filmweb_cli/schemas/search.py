@@ -7,23 +7,29 @@ from .cast import CastMember
 
 class SearchHit(BaseModel):
     id: int
-    matched_title: str | None = Field(default=None, alias="matchedTitle")
-    matched_lang: str | None = Field(default=None, alias="matchedLang")
-    film_main_cast: list[CastMember] | None = Field(default=None, alias="filmMainCast")
 
     def display_name(self) -> str:
-        return self.matched_title or str(self.id)
+        return str(self.id)
 
 
-class SearchFilmHit(SearchHit):
+class SearchContent(SearchHit):
+    matched_title: str = Field(alias="matchedTitle")
+    matched_lang: str = Field(alias="matchedLang")
+    main_cast: list[CastMember] = Field(default_factory=list, alias="filmMainCast")
+
+    def display_name(self) -> str:
+        return self.matched_title
+
+
+class SearchFilmHit(SearchContent):
     type: Literal["film"]
 
 
-class SearchSeriesHit(SearchHit):
+class SearchSeriesHit(SearchContent):
     type: Literal["serial"]
 
 
-class SearchGameHit(SearchHit):
+class SearchGameHit(SearchContent):
     type: Literal["game"]
 
 
