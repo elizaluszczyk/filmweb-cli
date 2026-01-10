@@ -43,6 +43,8 @@ class SearchCharacterHit(SearchHit):
 
 class SearchPersonHit(SearchHit):
     type: Literal["person"]
+    person_know_for: int = Field(alias="personKnowFor")
+    person_main_profession: str = Field(alias="personMainProfession")
 
 
 class SearchResponse(BaseModel):
