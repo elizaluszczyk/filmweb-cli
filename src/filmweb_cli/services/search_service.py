@@ -1,5 +1,5 @@
 from filmweb_cli.client import FilmwebClient
-from filmweb_cli.schemas.search import SearchResponse
+from filmweb_cli.schemas.search.response import SearchResponse
 
 
 class SearchService:
