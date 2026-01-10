@@ -1,7 +1,13 @@
+from typing import TYPE_CHECKING
+
 import click
 
 from .client import FilmwebClient
+from .display import Displayable, print_search_results
 from .services.search_service import SearchService
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 @click.group()
@@ -18,8 +24,15 @@ def search(client: FilmwebClient, query: str) -> None:
 
     search_results = search_service.search(query)
 
-    for result in search_results.search_hits:
-        click.echo(result.display_name())
+    categories: list[tuple[str, Sequence[Displayable]]] = [
+        ("FILMS", search_results.get_films()),
+        ("SERIES", search_results.get_series()),
+        ("GAMES", search_results.get_games()),
+        ("CHARACTERS", search_results.get_characters()),
+        ("PEOPLE", search_results.get_movie_people()),
+    ]
+
+    print_search_results(categories)
 
 
 if __name__ == "__main__":
