@@ -2,7 +2,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from .cast import CastMember
+from filmweb_cli.schemas.cast import CastMember
 
 
 class SearchHit(BaseModel):
