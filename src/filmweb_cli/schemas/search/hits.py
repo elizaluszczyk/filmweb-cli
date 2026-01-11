@@ -8,9 +8,6 @@ from filmweb_cli.schemas.people import Person
 class SearchHit(BaseModel):
     id: int
 
-    def display_name(self) -> str:
-        return str(self.id)
-
     def get_id(self) -> str:
         return str(self.id)
 
