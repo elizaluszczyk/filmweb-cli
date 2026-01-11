@@ -17,7 +17,7 @@ class SearchHit(BaseModel):
 
 class SearchContent(SearchHit):
     matched_title: str = Field(alias="matchedTitle")
-    matched_lang: str = Field(alias="matchedLang")
+    matched_lang: str | None = Field(default=None, alias="matchedLang")
     main_cast: list[Person] = Field(default_factory=list, alias="filmMainCast")
 
     def display_name(self) -> str:
