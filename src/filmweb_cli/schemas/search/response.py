@@ -2,10 +2,10 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field
 
-from .hits import SearchCharacterHit, SearchFilmHit, SearchGameHit, SearchPersonHit, SearchSeriesHit
+from .hits import SearchCharacterHit, SearchFilmHit, SearchGameHit, SearchPersonHit, SearchSeriesHit, SearchWorldHit
 
 SearchResult = Annotated[
-    SearchFilmHit | SearchSeriesHit | SearchGameHit | SearchCharacterHit | SearchPersonHit,
+    SearchFilmHit | SearchSeriesHit | SearchGameHit | SearchCharacterHit | SearchPersonHit | SearchWorldHit,
     Field(discriminator="type"),
 ]
 
@@ -30,3 +30,6 @@ class SearchResponse(BaseModel):
 
     def get_movie_people(self) -> list[SearchPersonHit]:
         return [hit for hit in self.search_hits if isinstance(hit, SearchPersonHit)]
+
+    def get_worlds(self) -> list[SearchWorldHit]:
+        return [hit for hit in self.search_hits if isinstance(hit, SearchWorldHit)]
