@@ -42,7 +42,7 @@ class FilmInfo(ContentInfo):
 
 class SeriesInfo(ContentInfo):
     entity_name: Literal["serial"] = Field(alias="entityName")
-    sub_type: Literal["serial_tv"] = Field(alias="subType")
+    sub_type: Literal["serial_tv", "mini_serial"] = Field(alias="subType")
 
 
 class GameInfo(ContentInfo):
