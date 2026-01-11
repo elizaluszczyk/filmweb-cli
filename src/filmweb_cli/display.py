@@ -4,6 +4,8 @@ from typing import Protocol
 from rich.console import Console
 from rich.table import Table
 
+from filmweb_cli.schemas.info.info import ContentInfo
+
 console = Console()
 
 
@@ -32,3 +34,29 @@ def print_search_results(categories: list[tuple[str, Sequence[Displayable]]]) ->
 
     if not has_results:
         console.print("[dim]No results found.[/dim]")
+
+
+def print_preview(info: ContentInfo) -> None:
+    title = info.title.title if info.title else info.original_title.title
+    original = info.original_title.title
+
+    if title != original:
+        console.print(f"[bold]{title}[/bold] | [dim]{original}[/dim]")
+    else:
+        console.print(f"[bold]{title}[/bold]")
+
+    genres = ", ".join(g.name for g in info.genres)
+    console.print(
+        f"{info.year} · {info.duration} min · {genres}",
+        style="dim cyan",
+    )
+    console.print()
+
+    if info.directors:
+        console.print(f"[bold]Directors:[/bold] {', '.join(d.name for d in info.directors)}")
+
+    if info.main_cast:
+        console.print(f"[bold]Main cast:[/bold] {', '.join(p.name for p in info.main_cast)}")
+
+    console.print()
+    console.print(info.description)
