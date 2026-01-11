@@ -11,6 +11,9 @@ class SearchHit(BaseModel):
     def display_name(self) -> str:
         return str(self.id)
 
+    def get_id(self) -> str:
+        return str(self.id)
+
 
 class SearchContent(SearchHit):
     matched_title: str = Field(alias="matchedTitle")
