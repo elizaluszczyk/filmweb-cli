@@ -48,6 +48,10 @@ class SearchPersonHit(SearchHit):
     type: Literal["person"]
     person_know_for: int = Field(alias="personKnowFor")
     person_main_profession: str = Field(alias="personMainProfession")
+    full_name: str | None = Field(default=None)
+
+    def display_name(self) -> str:
+        return self.full_name or f"Person: {self.id!s}"
 
 
 class SearchWorldHit(SearchHit):
