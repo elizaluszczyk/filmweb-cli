@@ -2,7 +2,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from filmweb_cli.schemas.cast import CastMember
+from filmweb_cli.schemas.people import Person
 
 
 class SearchHit(BaseModel):
@@ -15,7 +15,7 @@ class SearchHit(BaseModel):
 class SearchContent(SearchHit):
     matched_title: str = Field(alias="matchedTitle")
     matched_lang: str = Field(alias="matchedLang")
-    main_cast: list[CastMember] = Field(default_factory=list, alias="filmMainCast")
+    main_cast: list[Person] = Field(default_factory=list, alias="filmMainCast")
 
     def display_name(self) -> str:
         return self.matched_title

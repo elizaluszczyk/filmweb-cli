@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
 
-class CastMember(BaseModel):
+class Person(BaseModel):
     id: int
     name: str
