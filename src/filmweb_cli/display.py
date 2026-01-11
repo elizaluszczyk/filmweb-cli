@@ -2,6 +2,7 @@ from collections.abc import Sequence
 from typing import Protocol
 
 from rich.console import Console
+from rich.panel import Panel
 from rich.table import Table
 
 from filmweb_cli.schemas.info.info import ContentInfo
@@ -40,17 +41,14 @@ def print_preview(info: ContentInfo) -> None:
     title = info.title.title if info.title else info.original_title.title
     original = info.original_title.title
 
+    panel_title = f"[bold]{title}[/bold]"
     if title != original:
-        console.print(f"[bold]{title}[/bold] | [dim]{original}[/dim]")
-    else:
-        console.print(f"[bold]{title}[/bold]")
+        panel_title += f" / [dim]{original}[/dim]"
 
     genres = ", ".join(g.name for g in info.genres)
-    console.print(
-        f"{info.year} · {info.duration} min · {genres}",
-        style="dim cyan",
-    )
-    console.print()
+    panel_content = f"[dim cyan]{info.year} · {info.duration} min · {genres}[/dim cyan]"
+
+    console.print(Panel(panel_content, title=panel_title, title_align="left"))
 
     if info.directors:
         console.print(f"[bold]Directors:[/bold] {', '.join(d.name for d in info.directors)}")
