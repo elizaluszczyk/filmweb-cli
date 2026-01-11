@@ -13,6 +13,6 @@ class InfoService:
         self.client = client
         self.adapter = TypeAdapter(ContentPreview)
 
-    def show_content_preview(self, content_id: int) -> ContentPreview:
-        info_response = self.client.get(f"/film/{content_id}/preview")
+    async def show_content_preview(self, content_id: int) -> ContentPreview:
+        info_response = await self.client.get(f"/film/{content_id}/preview")
         return self.adapter.validate_python(info_response.json())
