@@ -1,3 +1,4 @@
+import asyncio
 from typing import TYPE_CHECKING
 
 import click
@@ -23,7 +24,7 @@ def main(ctx: click.Context) -> None:
 def search(client: FilmwebClient, query: str) -> None:
     search_service = SearchService(client)
 
-    search_results = search_service.search(query)
+    search_results = asyncio.run(search_service.search(query))
 
     categories: list[tuple[str, Sequence[Displayable]]] = [
         ("FILMS", search_results.get_films()),
@@ -43,7 +44,7 @@ def search(client: FilmwebClient, query: str) -> None:
 def show_info(client: FilmwebClient, content_id: str) -> None:
     info_service = InfoService(client)
 
-    content_info = info_service.show_content_preview(int(content_id))
+    content_info = asyncio.run(info_service.show_content_preview(int(content_id)))
 
     print_preview(content_info)
 
