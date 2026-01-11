@@ -9,6 +9,7 @@ console = Console()
 
 class Displayable(Protocol):
     def display_name(self) -> str: ...
+    def get_id(self) -> str: ...
 
 
 def print_search_results(categories: list[tuple[str, Sequence[Displayable]]]) -> None:
@@ -24,7 +25,7 @@ def print_search_results(categories: list[tuple[str, Sequence[Displayable]]]) ->
         table.add_column()
 
         for i, item in enumerate(items, 1):
-            table.add_row(str(i), item.display_name())
+            table.add_row(str(i), item.display_name(), item.get_id())
 
         console.print(table)
         console.print()
