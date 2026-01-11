@@ -1,11 +1,18 @@
+from typing import Annotated
+
 from pydantic import BaseModel, Field
 
 from .hits import SearchCharacterHit, SearchFilmHit, SearchGameHit, SearchPersonHit, SearchSeriesHit
 
+SearchResult = Annotated[
+    SearchFilmHit | SearchSeriesHit | SearchGameHit | SearchCharacterHit | SearchPersonHit,
+    Field(discriminator="type"),
+]
+
 
 class SearchResponse(BaseModel):
     total: int
-    search_hits: list[SearchFilmHit | SearchSeriesHit | SearchGameHit | SearchCharacterHit | SearchPersonHit] = Field(
+    search_hits: list[SearchResult] = Field(
         alias="searchHits",
     )
 
