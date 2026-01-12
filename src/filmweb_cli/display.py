@@ -46,7 +46,20 @@ def print_preview(info: ContentInfo) -> None:
         panel_title += f" / [dim]{original}[/dim]"
 
     genres = ", ".join(g.name for g in info.genres)
-    panel_content = f"[dim cyan]{info.year} · {info.duration} min · {genres}[/dim cyan]"
+
+    data = []
+
+    if info.year:
+        data.append(str(info.year))
+
+    if info.duration:
+        data.append(f"{info.duration} min")
+
+    if genres:
+        data.append(genres)
+
+    data_text = " · ".join(data)
+    panel_content = f"[dim cyan]{data_text}[/dim cyan]"
 
     console.print(Panel(panel_content, title=panel_title, title_align="left"))
 
@@ -56,5 +69,6 @@ def print_preview(info: ContentInfo) -> None:
     if info.main_cast:
         console.print(f"[bold]Main cast:[/bold] {', '.join(p.name for p in info.main_cast)}")
 
-    console.print()
-    console.print(info.description)
+    if info.description:
+        console.print()
+        console.print(info.description)
