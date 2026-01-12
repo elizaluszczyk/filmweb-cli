@@ -9,8 +9,8 @@ selected=$(
         --delimiter=$'\t' \
         --with-nth=2.. \
         --bind "change:reload:filmweb-cli search --raw {q} 2>/dev/null || true" \
-        --preview "filmweb-cli info {1} 2>/dev/null" \
-        --preview-window=right:50% \
+        --preview "FORCE_COLOR=1 filmweb-cli info {1} 2>/dev/null" \
+        --preview-window=right:50%:wrap \
         < /dev/null
 )
 
