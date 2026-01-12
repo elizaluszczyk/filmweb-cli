@@ -7,7 +7,7 @@ from rich.table import Table
 
 from filmweb_cli.schemas.info.info import ContentInfo
 
-console = Console()
+console = Console(width=80)
 
 
 class Displayable(Protocol):
@@ -61,7 +61,7 @@ def print_preview(info: ContentInfo) -> None:
     data_text = " · ".join(data)
     panel_content = f"[dim cyan]{data_text}[/dim cyan]"
 
-    console.print(Panel(panel_content, title=panel_title, title_align="left"))
+    console.print(Panel(panel_content, title=panel_title, title_align="left", expand=False, border_style="dim"))
 
     if info.directors:
         console.print(f"[bold]Directors:[/bold] {', '.join(d.name for d in info.directors)}")
