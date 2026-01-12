@@ -1,0 +1,21 @@
+#!/bin/bash
+
+selected=$(
+    fzf \
+        --print-query \
+        --prompt="Search: " \
+        --height=80% \
+        --layout=reverse \
+        --delimiter=$'\t' \
+        --with-nth=2.. \
+        --bind "change:reload:filmweb-cli search --raw {q} 2>/dev/null || true" \
+        --preview "filmweb-cli info {1} 2>/dev/null" \
+        --preview-window=right:50% \
+        < /dev/null
+)
+
+content_id=$(echo "$selected" | sed -n '2p' | cut -f1)
+
+if [[ -n "$content_id" ]]; then
+    filmweb-cli info "$content_id"
+fi
