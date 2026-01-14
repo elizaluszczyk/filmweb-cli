@@ -38,7 +38,7 @@ def print_search_results(categories: list[tuple[str, Sequence[Displayable]]]) ->
         console.print("[dim]No results found.[/dim]")
 
 
-def print_preview(info: ContentInfo) -> None:
+def print_preview(info: ContentInfo, rating: ContentRating) -> None:
     title = info.title.title if info.title else info.original_title.title
     original = info.original_title.title
 
@@ -63,6 +63,10 @@ def print_preview(info: ContentInfo) -> None:
     panel_content = f"[dim cyan]{data_text}[/dim cyan]"
 
     console.print(Panel(panel_content, title=panel_title, title_align="left", expand=False, border_style="dim"))
+
+    if rating:
+        count_display = f"{rating.count}" if rating.count < 1000 else f"{rating.count / 1000:.0f} tys"
+        console.print(f"[bold magenta]★ {rating.rate:.1f}[/bold magenta][dim] · {count_display}[/dim]")
 
     if info.directors:
         console.print(f"[bold]Directors:[/bold] {', '.join(d.name for d in info.directors)}")
