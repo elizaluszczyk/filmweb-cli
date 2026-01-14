@@ -4,8 +4,11 @@ from pydantic import Field, TypeAdapter
 
 from filmweb_cli.client import FilmwebClient
 from filmweb_cli.schemas.info.info import FilmInfo, GameInfo, SeriesInfo
+from filmweb_cli.schemas.info.rating import ContentRating
 
 ContentPreview = Annotated[FilmInfo | SeriesInfo | GameInfo, Field(discriminator="entity_name")]
+
+NO_CONTENT_RESPONSE = 204
 
 
 class InfoService:
@@ -16,3 +19,10 @@ class InfoService:
     async def show_content_preview(self, content_id: int) -> ContentPreview:
         info_response = await self.client.get(f"/film/{content_id}/preview")
         return self.adapter.validate_python(info_response.json())
+
+    async def show_content_rating(self, content_id: int) -> ContentRating | None:
+        rating_response = await self.client.get(f"/film/{content_id}/rating")
+        if rating_response.status_code == NO_CONTENT_RESPONSE:
+            return None
+
+        return ContentRating.model_validate(rating_response.json())
