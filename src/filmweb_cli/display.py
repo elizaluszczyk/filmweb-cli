@@ -6,7 +6,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 from filmweb_cli.schemas.info.info import ContentInfo
-from filmweb_cli.schemas.info.rating import ContentRating
+from filmweb_cli.schemas.info.rating import ContentRating, Rating
 
 console = Console(width=80, highlight=False)
 
@@ -40,7 +40,7 @@ def print_search_results(categories: list[tuple[str, Sequence[Displayable]]]) ->
         console.print("[dim]No results found.[/dim]")
 
 
-def print_preview(info: ContentInfo, rating: ContentRating) -> None:
+def print_preview(info: ContentInfo, rating: ContentRating, critics_rating: Rating) -> None:
     title = info.title.title if info.title else info.original_title.title
     original = info.original_title.title
 
@@ -57,6 +57,13 @@ def print_preview(info: ContentInfo, rating: ContentRating) -> None:
             f"[bold magenta]★ {rating.rate:.1f}[/bold magenta]"
             f"[dim] · {_format_count(rating.count)}[/dim]",
         )
+
+    if critics_rating:
+        console.print(
+            f"[bold green]☆ {critics_rating.rate:.1f}[/bold green]"
+            f"[dim] · {critics_rating.count} critics[/dim]",
+        )
+        console.print()
 
     if info.directors:
         console.print(f"[bold]Directors:[/bold] {_join_names(info.directors)}")
