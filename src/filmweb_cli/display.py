@@ -77,7 +77,7 @@ def print_preview(info: ContentInfo, rating: ContentRating, critics_rating: Rati
 
 
 def _format_count(count: int) -> str:
-    return f"{count / 1000:.0f} tys" if count >= THOUSAND_THRESHOLD else str(count)
+    return f"{count / 1000:.0f}k ratings" if count >= THOUSAND_THRESHOLD else str(count)
 
 
 def _join_names(items: list) -> str:
