@@ -10,6 +10,8 @@ from filmweb_cli.schemas.info.rating import ContentRating
 
 console = Console(width=80, highlight=False)
 
+THOUSAND_THRESHOLD = 1000
+
 
 class Displayable(Protocol):
     def display_name(self) -> str: ...
@@ -42,38 +44,50 @@ def print_preview(info: ContentInfo, rating: ContentRating) -> None:
     title = info.title.title if info.title else info.original_title.title
     original = info.original_title.title
 
-    panel_title = f"[bold]{title}[/bold]"
-    if title != original:
-        panel_title += f" / [dim]{original}[/dim]"
-
-    genres = ", ".join(g.name for g in info.genres)
-
-    data = []
-
-    if info.year:
-        data.append(str(info.year))
-
-    if info.duration:
-        data.append(f"{info.duration} min")
-
-    if genres:
-        data.append(genres)
-
-    data_text = " · ".join(data)
-    panel_content = f"[dim cyan]{data_text}[/dim cyan]"
-
-    console.print(Panel(panel_content, title=panel_title, title_align="left", expand=False, border_style="dim"))
+    console.print(Panel(
+        f"[dim cyan]{_build_metadata_line(info)}[/dim cyan]",
+        title=_build_panel_title(title, original),
+        title_align="left",
+        expand=False,
+        border_style="dim",
+    ))
 
     if rating:
-        count_display = f"{rating.count}" if rating.count < 1000 else f"{rating.count / 1000:.0f} tys"
-        console.print(f"[bold magenta]★ {rating.rate:.1f}[/bold magenta][dim] · {count_display}[/dim]")
+        console.print(
+            f"[bold magenta]★ {rating.rate:.1f}[/bold magenta]"
+            f"[dim] · {_format_count(rating.count)}[/dim]",
+        )
 
     if info.directors:
-        console.print(f"[bold]Directors:[/bold] {', '.join(d.name for d in info.directors)}")
+        console.print(f"[bold]Directors:[/bold] {_join_names(info.directors)}")
 
     if info.main_cast:
-        console.print(f"[bold]Main cast:[/bold] {', '.join(p.name for p in info.main_cast)}")
+        console.print(f"[bold]Main cast:[/bold] {_join_names(info.main_cast)}")
 
     if info.description:
         console.print()
         console.print(info.description)
+
+
+def _format_count(count: int) -> str:
+    return f"{count / 1000:.0f} tys" if count >= THOUSAND_THRESHOLD else str(count)
+
+
+def _join_names(items: list) -> str:
+    return ", ".join(item.name for item in items)
+
+
+def _build_panel_title(title: str, original: str) -> str:
+    panel_title = f"[bold]{title}[/bold]"
+    if title != original:
+        panel_title += f" / [dim]{original}[/dim]"
+    return panel_title
+
+
+def _build_metadata_line(info: ContentInfo) -> str:
+    metadata = [
+        str(info.year) if info.year else None,
+        f"{info.duration} min" if info.duration else None,
+        _join_names(info.genres) if info.genres else None,
+    ]
+    return " · ".join(filter(None, metadata))
