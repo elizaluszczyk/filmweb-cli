@@ -57,10 +57,11 @@ def show_info(client: FilmwebClient, content_id: str) -> None:
         info_service = InfoService(client)
         content_info = await info_service.show_content_preview(int(content_id))
         rating_info = await info_service.show_content_rating(int(content_id))
-        return content_info, rating_info
+        critics_rating_info = await info_service.show_critics_content_rating(int(content_id))
+        return content_info, rating_info, critics_rating_info
 
-    content_info, rating_info = asyncio.run(fetch_info())
-    print_preview(content_info, rating_info)
+    content_info, rating_info, critics_rating_info = asyncio.run(fetch_info())
+    print_preview(content_info, rating_info, critics_rating_info)
 
 
 if __name__ == "__main__":
