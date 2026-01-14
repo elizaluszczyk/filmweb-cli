@@ -1,9 +1,12 @@
 from pydantic import BaseModel, Field
 
 
-class ContentRating(BaseModel):
+class Rating(BaseModel):
     count: int
     rate: float
+
+
+class ContentRating(Rating):
     count_want_to_see: int = Field(alias="countWantToSee")
     count_vote_1: int | None = Field(default=None, alias="countVote1")
     count_vote_2: int | None = Field(default=None, alias="countVote2")
