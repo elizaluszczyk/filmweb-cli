@@ -6,8 +6,9 @@ from rich.panel import Panel
 from rich.table import Table
 
 from filmweb_cli.schemas.info.info import ContentInfo
+from filmweb_cli.schemas.info.rating import ContentRating
 
-console = Console(width=80)
+console = Console(width=80, highlight=False)
 
 
 class Displayable(Protocol):
