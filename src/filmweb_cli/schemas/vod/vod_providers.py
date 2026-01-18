@@ -15,7 +15,7 @@ class ContentVodProvider(BaseModel):  # not all information from api response is
     id: int
     film: int
     start: str
-    link: str
+    link: str | None = Field(default=None)
     payments: list[Payment] = Field(default_factory=list)
 
 
