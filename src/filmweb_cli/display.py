@@ -116,10 +116,16 @@ def print_where_to_watch(where_to_watch_list: list[WhereToWatch]) -> None:
 
         console.print(f"[bold {style}]● {title}[/bold {style}]")
 
-        sorted_items = sorted(items.items(), key=lambda x: min(x[1]))
+        sorted_items = sorted(
+            items.items(),
+            key=lambda x: min(x[1]) if x[1] else float("inf"),
+        )
         for name, prices in sorted_items:
-            price = min(prices) / 100
-            console.print(f"  {name} [dim]· {price:.2f} PLN[/dim]")
+            if prices:
+                best_price = min(prices) / 100
+                console.print(f"  {name} [dim]· {best_price:.2f} PLN[/dim]")
+            else:
+                console.print(f"  {name}")
         console.print()
 
     def print_category(title: str, style: str, items: set[str]) -> None:
@@ -182,7 +188,11 @@ def _group_providers(
 
         name = vod.provider.display_name
 
-        for payment in vod.content.payments or []:
+        if not vod.content.payments:
+            subscription.setdefault(name, [])
+            continue
+
+        for payment in vod.content.payments:
             if payment.subscription:
                 subscription.setdefault(name, []).append(payment.price)
             elif payment.rent:
