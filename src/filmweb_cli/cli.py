@@ -123,9 +123,10 @@ def show_vod_providers(client: FilmwebClient, content_id: str, *, compact: bool)
 
     async def fetch_info() -> tuple:
         vod_service = VodService(client)
-        vod_providers = await vod_service.get_vod_providers()
-        content_vod_providers = await vod_service.get_content_vod_providers(parsed_id)
-        return vod_providers, content_vod_providers
+        return await asyncio.gather(
+            vod_service.get_vod_providers(),
+            vod_service.get_content_vod_providers(parsed_id),
+        )
 
     vod_providers, content_vod_providers = asyncio.run(fetch_info())
 
