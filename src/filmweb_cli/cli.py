@@ -19,6 +19,10 @@ from .services.vod_service import VodService
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+VALID_CONTENT_TYPES = {"film", "series", "game", "person", "character"}
+MEDIA_TYPES = {"film", "series", "game"}
+VOD_TYPES = {"film", "series"}
+
 
 @click.group()
 @click.pass_context
@@ -35,16 +39,16 @@ def search(client: FilmwebClient, query: str, *, raw: bool) -> None:
     search_results = asyncio.run(search_service.search(query))
 
     if raw:
-        for category, items in [
-            ("FILM", search_results.get_films()),
-            ("SERIES", search_results.get_series()),
-            ("GAME", search_results.get_games()),
-            ("CHARACTER", search_results.get_characters()),
-            ("PERSON", search_results.get_movie_people()),
-            ("WORLD", search_results.get_worlds()),
+        for type_prefix, category, items in [
+            ("film", "FILM", search_results.get_films()),
+            ("series", "SERIES", search_results.get_series()),
+            ("game", "GAME", search_results.get_games()),
+            ("character", "CHARACTER", search_results.get_characters()),
+            ("person", "PERSON", search_results.get_movie_people()),
+            ("world", "WORLD", search_results.get_worlds()),
         ]:
             for item in items:
-                click.echo(f"{item.get_id()}\t[{category}] {item.display_name()}")
+                click.echo(f"{type_prefix}:{item.get_id()}\t[{category}] {item.display_name()}")
     else:
         categories: list[tuple[str, Sequence[Displayable]]] = [
             ("FILMS", search_results.get_films()),
@@ -61,15 +65,28 @@ def search(client: FilmwebClient, query: str, *, raw: bool) -> None:
 @click.argument("content_id")
 @click.pass_obj
 def show_info(client: FilmwebClient, content_id: str) -> None:
-    async def fetch_info() -> tuple:
-        info_service = InfoService(client)
-        content_info = await info_service.show_content_preview(int(content_id))
-        rating_info = await info_service.show_content_rating(int(content_id))
-        critics_rating_info = await info_service.show_critics_content_rating(int(content_id))
-        return content_info, rating_info, critics_rating_info
+    info_service = InfoService(client)
 
-    content_info, rating_info, critics_rating_info = asyncio.run(fetch_info())
-    print_preview(content_info, rating_info, critics_rating_info)
+    parsed_type, parsed_id = _parse_content_input(content_id)
+    if parsed_type in MEDIA_TYPES:
+        async def fetch_media_info() -> tuple:
+            content_info = await info_service.show_content_preview(parsed_id)
+            rating_info = await info_service.show_content_rating(parsed_id)
+            critics_rating_info = await info_service.show_critics_content_rating(parsed_id)
+            return content_info, rating_info, critics_rating_info
+
+        content_info, rating_info, critics_rating_info = asyncio.run(fetch_media_info())
+        print_preview(content_info, rating_info, critics_rating_info)
+
+    elif parsed_type == "person":  # TODO(eliza): function for fetching person info
+        click.echo(f"Information about person {parsed_id}")
+
+    elif parsed_type == "character":  # TODO(eliza): function for fetching character info
+        click.echo(f"Information about character {parsed_id}")
+
+    else:
+        click.echo(f"Unsupported content type: {parsed_type}")
+        raise SystemExit(1)
 
 
 @main.command("vod")
@@ -77,10 +94,15 @@ def show_info(client: FilmwebClient, content_id: str) -> None:
 @click.option("--compact", "-c", is_flag=True, hidden=True, help="Compact display of vod providers")
 @click.pass_obj
 def show_vod_providers(client: FilmwebClient, content_id: str, *, compact: bool) -> None:
+    parsed_type, parsed_id = _parse_content_input(content_id)
+
+    if parsed_type not in VOD_TYPES:
+        raise SystemExit(0)
+
     async def fetch_info() -> tuple:
         vod_service = VodService(client)
         vod_providers = await vod_service.get_vod_providers()
-        content_vod_providers = await vod_service.get_content_vod_providers(int(content_id))
+        content_vod_providers = await vod_service.get_content_vod_providers(parsed_id)
         return vod_providers, content_vod_providers
 
     vod_providers, content_vod_providers = asyncio.run(fetch_info())
@@ -99,6 +121,20 @@ def show_vod_providers(client: FilmwebClient, content_id: str, *, compact: bool)
         print_where_to_watch_compact(where_to_watch_list)
     else:
         print_where_to_watch(where_to_watch_list)
+
+
+def _parse_content_input(content_id: str) -> tuple[str, int]:
+    if ":" in content_id:
+        type_prefix, numeric_id = content_id.split(":", 1)
+
+        if type_prefix not in VALID_CONTENT_TYPES:
+            click.echo(f"Unknkown prefix: {type_prefix}.")
+            click.echo(f"Available: {', '.join(VALID_CONTENT_TYPES)}")
+            raise SystemExit(1)
+
+        return type_prefix, int(numeric_id)
+
+    return "film", int(content_id)
 
 
 if __name__ == "__main__":
