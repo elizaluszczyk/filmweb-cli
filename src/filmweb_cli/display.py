@@ -47,24 +47,24 @@ def print_preview(
     title = info.title.title if info.title else info.original_title.title
     original = info.original_title.title
 
-    console.print(Panel(
-        f"[dim cyan]{_build_metadata_line(info)}[/dim cyan]",
-        title=_build_panel_title(title, original),
-        title_align="left",
-        expand=False,
-        border_style="dim",
-    ))
+    console.print(
+        Panel(
+            f"[dim cyan]{_build_metadata_line(info)}[/dim cyan]",
+            title=_build_panel_title(title, original),
+            title_align="left",
+            expand=False,
+            border_style="dim",
+        ),
+    )
 
     if rating:
         console.print(
-            f"[bold magenta]★ {rating.rate:.1f}[/bold magenta]"
-            f"[dim] · {_format_count(rating.count)}[/dim]",
+            f"[bold magenta]★ {rating.rate:.1f}[/bold magenta][dim] · {_format_count(rating.count)}[/dim]",
         )
 
     if critics_rating:
         console.print(
-            f"[bold green]☆ {critics_rating.rate:.1f}[/bold green]"
-            f"[dim] · {critics_rating.count} critics[/dim]",
+            f"[bold green]☆ {critics_rating.rate:.1f}[/bold green][dim] · {critics_rating.count} critics[/dim]",
         )
         console.print()
 
