@@ -4,9 +4,17 @@ from typing import TYPE_CHECKING
 import click
 
 from .client import FilmwebClient
-from .display import Displayable, print_preview, print_search_results
+from .display import (
+    Displayable,
+    print_preview,
+    print_search_results,
+    print_where_to_watch,
+    print_where_to_watch_compact,
+)
+from .schemas.vod.vod_providers import WhereToWatch
 from .services.info_service import InfoService
 from .services.search_service import SearchService
+from .services.vod_service import VodService
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
@@ -62,6 +70,35 @@ def show_info(client: FilmwebClient, content_id: str) -> None:
 
     content_info, rating_info, critics_rating_info = asyncio.run(fetch_info())
     print_preview(content_info, rating_info, critics_rating_info)
+
+
+@main.command("vod")
+@click.argument("content_id")
+@click.option("--compact", "-c", is_flag=True, hidden=True, help="Compact display of vod providers")
+@click.pass_obj
+def show_vod_providers(client: FilmwebClient, content_id: str, *, compact: bool) -> None:
+    async def fetch_info() -> tuple:
+        vod_service = VodService(client)
+        vod_providers = await vod_service.get_vod_providers()
+        content_vod_providers = await vod_service.get_content_vod_providers(int(content_id))
+        return vod_providers, content_vod_providers
+
+    vod_providers, content_vod_providers = asyncio.run(fetch_info())
+
+    vod_providers_by_id = {p.id: p for p in vod_providers}
+
+    where_to_watch_list: list[WhereToWatch] = [
+        WhereToWatch(
+            content=cp,
+            provider=vod_providers_by_id.get(cp.vod_provider),
+        )
+        for cp in content_vod_providers
+    ]
+
+    if compact:
+        print_where_to_watch_compact(where_to_watch_list)
+    else:
+        print_where_to_watch(where_to_watch_list)
 
 
 if __name__ == "__main__":
