@@ -9,7 +9,7 @@ selected=$(
         --delimiter=$'\t' \
         --with-nth=2.. \
         --bind "change:reload:filmweb-cli search --raw {q} 2>/dev/null || true" \
-        --preview "FORCE_COLOR=1 filmweb-cli info {1}; FORCE_COLOR=1 filmweb-cli vod --compact {1}" \
+        --preview "FORCE_COLOR=1 filmweb-cli info {1} && FORCE_COLOR=1 filmweb-cli vod --compact {1}" \
         --preview-window=right:70%:wrap \
         < /dev/null
 )
@@ -17,6 +17,5 @@ selected=$(
 content_id=$(echo "$selected" | sed -n '2p' | cut -f1)
 
 if [[ -n "$content_id" ]]; then
-    filmweb-cli info "$content_id"
-    filmweb-cli vod "$content_id"
+    filmweb-cli info "$content_id" && filmweb-cli vod "$content_id"
 fi
