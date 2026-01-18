@@ -18,4 +18,5 @@ content_id=$(echo "$selected" | sed -n '2p' | cut -f1)
 
 if [[ -n "$content_id" ]]; then
     filmweb-cli info "$content_id"
+    filmweb-cli vod "$content_id"
 fi
