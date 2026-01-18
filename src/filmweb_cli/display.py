@@ -74,7 +74,9 @@ def print_preview(info: ContentInfo, rating: ContentRating, critics_rating: Rati
 
     if info.description:
         console.print()
-        console.print(info.description)
+
+        clean_description = " ".join(info.description.split())
+        console.print(clean_description)
 
 
 def _format_count(count: int) -> str:
