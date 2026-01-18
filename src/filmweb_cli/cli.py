@@ -63,20 +63,42 @@ def search(client: FilmwebClient, query: str, *, raw: bool) -> None:
 
 @main.command("info")
 @click.argument("content_id")
+@click.option("--full", "-f", is_flag=True, hidden=True, help="Show full description")
 @click.pass_obj
-def show_info(client: FilmwebClient, content_id: str) -> None:
+def show_info(client: FilmwebClient, content_id: str, *, full: bool) -> None:
     info_service = InfoService(client)
 
     parsed_type, parsed_id = _parse_content_input(content_id)
     if parsed_type in MEDIA_TYPES:
         async def fetch_media_info() -> tuple:
-            content_info = await info_service.show_content_preview(parsed_id)
-            rating_info = await info_service.show_content_rating(parsed_id)
-            critics_rating_info = await info_service.show_critics_content_rating(parsed_id)
-            return content_info, rating_info, critics_rating_info
+            tasks = [
+                info_service.get_content_preview(parsed_id),
+                info_service.get_content_rating(parsed_id),
+                info_service.get_critics_content_rating(parsed_id),
+            ]
 
-        content_info, rating_info, critics_rating_info = asyncio.run(fetch_media_info())
-        print_preview(content_info, rating_info, critics_rating_info)
+            if full:
+                tasks.append(info_service.get_full_description(parsed_id))
+
+            results = await asyncio.gather(*tasks)
+
+            preview = results[0]
+            rating = results[1]
+            critics = results[2]
+
+            desc = results[3] if full else None
+
+            return preview, rating, critics, desc
+
+        content_info, rating_info, critics_rating_info, full_description_info = asyncio.run(fetch_media_info())
+
+        print_preview(
+            content_info,
+            rating_info,
+            critics_rating_info,
+            full_description_info,
+            full_desc=full,
+        )
 
     elif parsed_type == "person":  # TODO(eliza): function for fetching person info
         click.echo(f"Information about person {parsed_id}")
