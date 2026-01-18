@@ -5,7 +5,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-from filmweb_cli.schemas.info.info import ContentInfo
+from filmweb_cli.schemas.info.info import ContentInfo, FullDescription
 from filmweb_cli.schemas.info.rating import ContentRating, Rating
 from filmweb_cli.schemas.vod.vod_providers import WhereToWatch
 
@@ -41,7 +41,9 @@ def print_search_results(categories: list[tuple[str, Sequence[Displayable]]]) ->
         console.print("[dim]No results found.[/dim]")
 
 
-def print_preview(info: ContentInfo, rating: ContentRating, critics_rating: Rating) -> None:
+def print_preview(
+    info: ContentInfo, rating: ContentRating, critics_rating: Rating, description: FullDescription, *, full_desc: bool,
+) -> None:
     title = info.title.title if info.title else info.original_title.title
     original = info.original_title.title
 
@@ -72,7 +74,12 @@ def print_preview(info: ContentInfo, rating: ContentRating, critics_rating: Rati
     if info.main_cast:
         console.print(f"[bold]Main cast:[/bold] {_join_names(info.main_cast)}")
 
-    if info.description:
+    if full_desc:
+        console.print()
+
+        clean_full_description = " ".join(description.text.split())
+        console.print(clean_full_description)
+    elif info.description:
         console.print()
 
         clean_description = " ".join(info.description.split())
