@@ -9,7 +9,7 @@ from filmweb_cli.schemas.info.info import ContentInfo
 from filmweb_cli.schemas.info.rating import ContentRating, Rating
 from filmweb_cli.schemas.vod.vod_providers import WhereToWatch
 
-console = Console(width=80, highlight=False)
+console = Console(width=85, highlight=False)
 
 THOUSAND_THRESHOLD = 1000
 
