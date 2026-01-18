@@ -16,18 +16,18 @@ class InfoService:
     def __init__(self, client: FilmwebClient) -> None:
         self.client = client
 
-    async def show_content_preview(self, content_id: int) -> ContentPreview:
+    async def get_content_preview(self, content_id: int) -> ContentPreview:
         info_response = await self.client.get(f"/film/{content_id}/preview")
         return CONTENT_PREVIEW_ADAPTER.validate_python(info_response.json())
 
-    async def show_content_rating(self, content_id: int) -> ContentRating | None:
+    async def get_content_rating(self, content_id: int) -> ContentRating | None:
         rating_response = await self.client.get(f"/film/{content_id}/rating")
         if rating_response.status_code == NO_CONTENT_RESPONSE:
             return None
 
         return ContentRating.model_validate(rating_response.json())
 
-    async def show_critics_content_rating(self, content_id: int) -> Rating | None:
+    async def get_critics_content_rating(self, content_id: int) -> Rating | None:
         critics_rating_response = await self.client.get(f"/film/{content_id}/critics/rating")
         if critics_rating_response.status_code == NO_CONTENT_RESPONSE:
             return None
