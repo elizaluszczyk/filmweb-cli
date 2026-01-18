@@ -24,6 +24,11 @@ class Genre(BaseModel):
         return v
 
 
+class FullDescription(BaseModel):  # not all information from api response is parsed here
+    id: int
+    text: str = Field(alias="synopsis")
+
+
 class ContentInfo(BaseModel):  # not all information from api response is parsed here
     main_cast: list[Person] = Field(default_factory=list, alias="mainCast")
     directors: list[Person] = Field(default_factory=list)
