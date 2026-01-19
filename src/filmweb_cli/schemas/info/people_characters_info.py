@@ -1,0 +1,28 @@
+from pydantic import BaseModel, Field
+
+
+class PersonalDetails(BaseModel):
+    real_name: str = Field(alias="realName")
+    height: int
+    birth_date_int: int = Field(alias="birthDateInt")
+
+
+class BirthPlace(BaseModel):
+    country: int
+    city_name: str = Field(alias="cityName")
+    region_name: str = Field(alias="regionName")
+
+
+class FigureInfo(BaseModel):
+    id: int
+    name: str
+    sex: int
+
+
+class PersonInfo(FigureInfo):  # not all information from api response is parsed here
+    details: PersonalDetails = Field(alias="info")
+    birthplace: BirthPlace
+    films_known_for: list[int] = Field(alias="filmsKnownFor")
+    main_profession: str = Field(alias="mainProfession")
+
+    known_for_titles: list[int] = Field(default_factory=list)
