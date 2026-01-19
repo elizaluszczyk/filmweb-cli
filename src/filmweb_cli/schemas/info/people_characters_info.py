@@ -5,6 +5,7 @@ class PersonalDetails(BaseModel):
     real_name: str | None = Field(default=None, alias="realName")
     height: int | None = None
     birth_date_int: int | None = Field(default=None, alias="birthDateInt")
+    death_date_int: int | None = Field(default=None, alias="deathDateInt")
 
 
 class BirthPlace(BaseModel):
