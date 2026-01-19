@@ -4,13 +4,9 @@ from typing import TYPE_CHECKING
 import click
 
 from .client import FilmwebClient
-from .display import (
-    Displayable,
-    print_preview,
-    print_search_results,
-    print_where_to_watch,
-    print_where_to_watch_compact,
-)
+from .display.content_preview import print_preview
+from .display.search import print_search_results
+from .display.vod import print_where_to_watch, print_where_to_watch_compact
 from .schemas.vod.vod_providers import WhereToWatch
 from .services.info_service import InfoService
 from .services.search_service import SearchService
@@ -18,6 +14,8 @@ from .services.vod_service import VodService
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+
+    from .display.search import Displayable
 
 VALID_CONTENT_TYPES = {"film", "series", "game", "person", "character"}
 MEDIA_TYPES = {"film", "series", "game"}
