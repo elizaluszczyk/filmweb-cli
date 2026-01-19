@@ -42,7 +42,7 @@ class ContentInfo(BaseModel):  # not all information from api response is parsed
 
 class FilmInfo(ContentInfo):
     entity_name: Literal["film"] = Field(alias="entityName")
-    sub_type: Literal["film_cinema", "film_tv"] = Field(alias="subType")
+    sub_type: Literal["film_cinema", "film_tv", "film_video"] = Field(alias="subType")
 
 
 class SeriesInfo(ContentInfo):
