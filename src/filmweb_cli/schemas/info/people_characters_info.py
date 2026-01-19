@@ -25,4 +25,4 @@ class PersonInfo(FigureInfo):  # not all information from api response is parsed
     films_known_for: list[int] = Field(alias="filmsKnownFor")
     main_profession: str = Field(alias="mainProfession")
 
-    known_for_titles: list[int] = Field(default_factory=list)
+    known_for_titles: list[str] = Field(default_factory=list)
