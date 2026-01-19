@@ -26,7 +26,7 @@ def print_person_preview(info: PersonInfo) -> None:
             console.print(f"[bold]Birthplace:[/bold] {place}")
             has_details = True
 
-    if info.details.height:
+    if info.details and info.details.height:
         console.print(f"[bold]Height:[/bold] {info.details.height} cm")
         has_details = True
 
@@ -47,14 +47,14 @@ def print_person_preview(info: PersonInfo) -> None:
 
 def _build_panel_title(info: PersonInfo) -> str:
     panel_title = f"[bold]{info.name}[/bold]"
-    if info.details.real_name:
+    if info.details and info.details.real_name:
         panel_title += f" / [dim]{info.details.real_name}[/dim]"
     return panel_title
 
 
 def _build_metadata_line(info: PersonInfo) -> str:
-    birth = info.details.birth_date_int
-    death = info.details.death_date_int
+    birth = info.details.birth_date_int if info.details else None
+    death = info.details.death_date_int if info.details else None
 
     age = _calculate_person_age(birth, death) if birth else None
 

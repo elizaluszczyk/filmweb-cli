@@ -7,7 +7,7 @@ class VodProvider(BaseModel):  # not all information from api response is parsed
     id: int
     name: str
     display_name: str = Field(alias="displayName")
-    link: str | None = Field(default=None)
+    link: str | None = None
 
 
 class ContentVodProvider(BaseModel):  # not all information from api response is parsed here
@@ -15,10 +15,10 @@ class ContentVodProvider(BaseModel):  # not all information from api response is
     id: int
     film: int
     start: str
-    link: str | None = Field(default=None)
+    link: str | None = None
     payments: list[Payment] = Field(default_factory=list)
 
 
 class WhereToWatch(BaseModel):
     content: ContentVodProvider
-    provider: VodProvider | None = Field(default=None)
+    provider: VodProvider | None = None

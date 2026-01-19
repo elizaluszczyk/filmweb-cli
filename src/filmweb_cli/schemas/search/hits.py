@@ -46,7 +46,7 @@ class SearchPersonHit(SearchHit):
     person_know_for: int = Field(alias="personKnowFor")
     person_main_profession: str = Field(alias="personMainProfession")
 
-    full_name: str | None = Field(default=None)
+    full_name: str | None = None
 
     def display_name(self) -> str:
         return self.full_name or f"Person: {self.id!s}"

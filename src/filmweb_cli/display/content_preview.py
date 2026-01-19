@@ -23,7 +23,7 @@ def print_content_preview(
         ),
     )
 
-    if rating:
+    if rating and rating.count is not None:
         console.print(
             f"[bold magenta]★ {rating.rate:.1f}[/bold magenta][dim] · {_format_count(rating.count)}[/dim]",
         )

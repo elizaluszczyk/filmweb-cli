@@ -7,7 +7,7 @@ from filmweb_cli.schemas.people import Person
 
 class TitleLocale(BaseModel):
     title: str
-    country: str | None = Field(default=None)
+    country: str | None = None
     language: str | None = Field(default=None, alias="lang")
     original: bool = False
 
@@ -33,10 +33,10 @@ class ContentInfo(BaseModel):  # not all information from api response is parsed
     main_cast: list[Person] = Field(default_factory=list, alias="mainCast")
     directors: list[Person] = Field(default_factory=list)
     year: int
-    title: TitleLocale | None = Field(default=None)
+    title: TitleLocale | None = None
     original_title: TitleLocale = Field(alias="originalTitle")
     genres: list[Genre]
-    duration: int | None = Field(default=None)
+    duration: int | None = None
     description: str = Field(alias="plotOrDescriptionSynopsis")
 
 
