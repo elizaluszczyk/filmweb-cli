@@ -49,7 +49,7 @@ class InfoService:
         return response
 
     async def _fetch_person_content(self, response: PersonInfo) -> None:
-        tasks = [self.get_content_preview(film_id) for film_id in response.films_known_for]
+        tasks = [self.get_content_preview(content_id) for content_id in response.content_known_for]
 
         if not tasks:
             return
