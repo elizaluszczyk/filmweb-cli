@@ -7,7 +7,7 @@ from filmweb_cli.schemas.info.rating import ContentRating, Rating
 THOUSAND_THRESHOLD = 1000
 
 
-def print_preview(
+def print_content_preview(
     info: ContentInfo, rating: ContentRating, critics_rating: Rating, description: FullDescription, *, full_desc: bool,
 ) -> None:
     title = info.title.title if info.title else info.original_title.title

@@ -4,7 +4,8 @@ from typing import TYPE_CHECKING
 import click
 
 from .client import FilmwebClient
-from .display.content_preview import print_preview
+from .display.content_preview import print_content_preview
+from .display.people_preview import print_person_preview
 from .display.search import print_search_results
 from .display.vod import print_where_to_watch, print_where_to_watch_compact
 from .schemas.vod.vod_providers import WhereToWatch
@@ -90,7 +91,7 @@ def show_info(client: FilmwebClient, content_id: str, *, full: bool) -> None:
 
         content_info, rating_info, critics_rating_info, full_description_info = asyncio.run(fetch_media_info())
 
-        print_preview(
+        print_content_preview(
             content_info,
             rating_info,
             critics_rating_info,
