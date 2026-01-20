@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+from .worlds import World
+
 
 class PersonalDetails(BaseModel):
     real_name: str | None = Field(default=None, alias="realName")
@@ -12,6 +14,17 @@ class BirthPlace(BaseModel):
     country: int | None = None
     city_name: str | None = Field(default=None, alias="cityName")
     region_name: str | None = Field(default=None, alias="regionName")
+
+
+class CharacterTypeName(BaseModel):
+    text: str | None = None
+    lang: str | None = None
+
+
+class CharacterType(BaseModel):
+    id: int
+    name: CharacterTypeName
+    name_key: str | None = Field(default=None, alias="nameKey")
 
 
 class FigureInfo(BaseModel):
@@ -27,3 +40,12 @@ class PersonInfo(FigureInfo):  # not all information from api response is parsed
     main_profession: str | None = Field(default=None, alias="mainProfession")
 
     known_for_titles: list[str] = Field(default_factory=list)
+
+
+class CharacterInfo(FigureInfo):  # not all information from api response is parsed here
+    real_name: str | None = Field(default=None, alias="realName")
+    like_count: int | None = Field(default=None, alias="likeCount")
+    world: World | None = None
+    types: list[CharacterType] = Field(default_factory=list)
+    real_name_key: str | None = Field(default=None, alias="realNameKey")
+    name_key: str | None = Field(default=None, alias="nameKey")
