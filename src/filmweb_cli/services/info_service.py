@@ -5,7 +5,7 @@ from pydantic import Field, TypeAdapter
 
 from filmweb_cli.client import FilmwebClient
 from filmweb_cli.schemas.info.content_info import FilmInfo, FullDescription, GameInfo, SeriesInfo
-from filmweb_cli.schemas.info.people_characters_info import PersonInfo
+from filmweb_cli.schemas.info.people_characters_info import CharacterInfo, PersonInfo
 from filmweb_cli.schemas.info.rating import ContentRating, Rating
 
 ContentPreview = Annotated[FilmInfo | SeriesInfo | GameInfo, Field(discriminator="entity_name")]
@@ -63,3 +63,7 @@ class InfoService:
             titles.append(title)
 
         response.known_for_titles = titles
+
+    async def get_character_preview(self, character_id: int) -> CharacterInfo:
+        character_response = await self.client.get(f"/character/{character_id}/preview")
+        return CharacterInfo.model_validate(character_response.json())
