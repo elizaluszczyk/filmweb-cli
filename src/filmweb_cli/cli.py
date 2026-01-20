@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 import click
 
 from .client import FilmwebClient
+from .display.character_preview import print_character_preview
 from .display.content_preview import print_content_preview
 from .display.people_preview import print_person_preview
 from .display.search import print_search_results
@@ -103,8 +104,9 @@ def show_info(client: FilmwebClient, content_id: str, *, full: bool) -> None:
         person_info = asyncio.run(info_service.get_person_preview(parsed_id))
         print_person_preview(person_info)
 
-    elif parsed_type == "character":  # TODO(eliza): function for fetching character info
-        click.echo(f"Information about character {parsed_id}")
+    elif parsed_type == "character":
+        character_info = asyncio.run(info_service.get_character_preview(parsed_id))
+        print_character_preview(character_info)
 
     else:
         click.echo(f"Unsupported content type: {parsed_type}")
