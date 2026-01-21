@@ -59,8 +59,9 @@ class InfoService:
         titles: list[str] = []
 
         for item in details:
-            title = item.title.title if item.title else item.original_title.title
-            titles.append(title)
+            if item:
+                title = item.title.title if item.title else item.original_title.title
+                titles.append(title)
 
         response.known_for_titles = titles
 
