@@ -4,6 +4,8 @@ from rich.table import Table
 from filmweb_cli.display.console import console
 from filmweb_cli.schemas.info.people_characters_info import CharacterContentResponse, CharacterInfo
 
+from .formatters import prettify_camel_case
+
 
 def print_character_preview(info: CharacterInfo, content_info: CharacterContentResponse) -> None:
     console.print(
@@ -20,7 +22,7 @@ def print_character_preview(info: CharacterInfo, content_info: CharacterContentR
         console.print("[bold green]You can see in:[/bold green]")
 
         for category, titles in content_info.known_for_titles.items():
-            console.print(f"\n[dim cyan]{category}[/dim cyan]")
+            console.print(f"\n[dim cyan]{prettify_camel_case(category)}[/dim cyan]")
 
             table = Table(box=None, show_header=False, padding=(0, 2))
             table.add_column(style="dim", width=3)

@@ -6,6 +6,8 @@ from rich.table import Table
 from filmweb_cli.display.console import console
 from filmweb_cli.schemas.info.people_characters_info import PersonInfo
 
+from .formatters import prettify_camel_case
+
 
 def print_person_preview(info: PersonInfo) -> None:
     console.print(
@@ -65,7 +67,7 @@ def _build_metadata_line(info: PersonInfo) -> str:
     date_str = _format_date_range(birth, death) if birth else None
 
     metadata = [
-        info.main_profession or None,
+        prettify_camel_case(info.main_profession) if info.main_profession else None,
         age_str,
         date_str,
     ]
