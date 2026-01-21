@@ -1,10 +1,11 @@
 from rich.panel import Panel
+from rich.table import Table
 
 from filmweb_cli.display.console import console
-from filmweb_cli.schemas.info.people_characters_info import CharacterInfo
+from filmweb_cli.schemas.info.people_characters_info import CharacterContentResponse, CharacterInfo
 
 
-def print_character_preview(info: CharacterInfo) -> None:
+def print_character_preview(info: CharacterInfo, content_info: CharacterContentResponse) -> None:
     console.print(
         Panel(
             f"[dim cyan]{_build_metadata_line(info)}[/dim cyan]",
@@ -14,6 +15,21 @@ def print_character_preview(info: CharacterInfo) -> None:
             border_style="dim",
         ),
     )
+
+    if content_info.known_for_titles:
+        console.print("[bold green]You can see in:[/bold green]")
+
+        for category, titles in content_info.known_for_titles.items():
+            console.print(f"\n[dim cyan]{category}[/dim cyan]")
+
+            table = Table(box=None, show_header=False, padding=(0, 2))
+            table.add_column(style="dim", width=3)
+            table.add_column()
+
+            for i, title in enumerate(titles, 1):
+                table.add_row(str(i), title)
+
+            console.print(table)
 
 
 def _build_panel_title(info: CharacterInfo) -> str:

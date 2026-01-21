@@ -105,8 +105,21 @@ def show_info(client: FilmwebClient, content_id: str, *, full: bool) -> None:
         print_person_preview(person_info)
 
     elif parsed_type == "character":
-        character_info = asyncio.run(info_service.get_character_preview(parsed_id))
-        print_character_preview(character_info)
+        async def fetch_character_info() -> tuple:
+            tasks = [
+                info_service.get_character_preview(parsed_id),
+                info_service.get_character_content(parsed_id),
+            ]
+
+            results = await asyncio.gather(*tasks)
+
+            preview = results[0]
+            content = results[1]
+
+            return preview, content
+
+        character_info, content_info = asyncio.run(fetch_character_info())
+        print_character_preview(character_info, content_info)
 
     else:
         click.echo(f"Unsupported content type: {parsed_type}")
