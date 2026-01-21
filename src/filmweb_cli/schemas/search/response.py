@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from .hits import SearchCharacterHit, SearchFilmHit, SearchGameHit, SearchPersonHit, SearchSeriesHit, SearchWorldHit
 
@@ -9,12 +9,22 @@ SearchResult = Annotated[
     Field(discriminator="type"),
 ]
 
+ALLOWED_TYPES = {"film", "serial", "game", "person", "character", "world"}
+
 
 class SearchResponse(BaseModel):
     total: int
-    search_hits: list[SearchResult] = Field(
-        alias="searchHits",
-    )
+    search_hits: list[SearchResult] = Field(alias="searchHits")
+
+    @model_validator(mode="before")
+    @classmethod
+    def filter_unknown_types(cls, data: dict) -> dict:
+        if "searchHits" in data:
+            data["searchHits"] = [
+                hit for hit in data["searchHits"]
+                if hit.get("type") in ALLOWED_TYPES
+            ]
+        return data
 
     def get_films(self) -> list[SearchFilmHit]:
         return [hit for hit in self.search_hits if isinstance(hit, SearchFilmHit)]
