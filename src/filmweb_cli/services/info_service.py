@@ -5,7 +5,7 @@ from pydantic import Field, TypeAdapter
 
 from filmweb_cli.client import FilmwebClient
 from filmweb_cli.schemas.info.content_info import FilmInfo, FullDescription, GameInfo, SeriesInfo
-from filmweb_cli.schemas.info.people_characters_info import CharacterInfo, PersonInfo
+from filmweb_cli.schemas.info.people_characters_info import CharacterContentResponse, CharacterInfo, PersonInfo
 from filmweb_cli.schemas.info.rating import ContentRating, Rating
 
 ContentPreview = Annotated[FilmInfo | SeriesInfo | GameInfo, Field(discriminator="entity_name")]
@@ -67,3 +67,38 @@ class InfoService:
     async def get_character_preview(self, character_id: int) -> CharacterInfo:
         character_response = await self.client.get(f"/character/{character_id}/preview")
         return CharacterInfo.model_validate(character_response.json())
+
+    async def get_character_content(self, character_id: int) -> CharacterContentResponse:
+        content_raw_response = await self.client.get_ajax(f"/character/filmIds/{character_id}")
+        response = CharacterContentResponse.model_validate(content_raw_response.json())
+
+        await self._fetch_character_content(response)
+
+        return response
+
+    async def _fetch_character_content(self, response: CharacterContentResponse) -> None:
+        tasks = []
+        category_map = []
+
+        for category, ids_list in response.content_known_for.items():
+            for content_id in ids_list:
+                tasks.append(self.get_content_preview(content_id))
+                category_map.append(category)
+
+        if not tasks:
+            return
+
+        results = await asyncio.gather(*tasks)
+
+        titles_dict: dict[str, list[str]] = {}
+
+        for category, item in zip(category_map, results, strict=True):
+            if item:
+                title = item.title.title if item.title else item.original_title.title
+
+                if category not in titles_dict:
+                    titles_dict[category] = []
+
+                titles_dict[category].append(title)
+
+        response.known_for_titles = titles_dict

@@ -49,3 +49,10 @@ class CharacterInfo(FigureInfo):  # not all information from api response is par
     types: list[CharacterType] = Field(default_factory=list)
     real_name_key: str | None = Field(default=None, alias="realNameKey")
     name_key: str | None = Field(default=None, alias="nameKey")
+
+
+class CharacterContentResponse(BaseModel):
+    content_known_for: dict[str, list[int]] = Field(default_factory=dict, alias="filmTypeFilmIds")
+    main_request_type: str = Field(alias="mainRequestType")
+
+    known_for_titles: dict[str, list[str]] = Field(default_factory=dict)
