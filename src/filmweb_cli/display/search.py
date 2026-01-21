@@ -3,7 +3,7 @@ from typing import Protocol
 
 from rich.table import Table
 
-from filmweb_cli.display.console import console
+from .console import console
 
 
 class Displayable(Protocol):

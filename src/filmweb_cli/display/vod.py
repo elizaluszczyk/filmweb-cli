@@ -1,5 +1,6 @@
-from filmweb_cli.display.console import console
 from filmweb_cli.schemas.vod.vod_providers import WhereToWatch
+
+from .console import console
 
 
 def print_where_to_watch(where_to_watch_list: list[WhereToWatch]) -> None:

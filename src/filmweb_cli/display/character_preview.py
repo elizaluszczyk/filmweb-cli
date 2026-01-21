@@ -1,9 +1,9 @@
 from rich.panel import Panel
 from rich.table import Table
 
-from filmweb_cli.display.console import console
 from filmweb_cli.schemas.info.people_characters_info import CharacterContentResponse, CharacterInfo
 
+from .console import console
 from .formatters import prettify_camel_case
 
 

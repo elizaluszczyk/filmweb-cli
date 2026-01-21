@@ -1,8 +1,9 @@
 from rich.panel import Panel
 
-from filmweb_cli.display.console import console
 from filmweb_cli.schemas.info.content_info import ContentInfo, FullDescription
 from filmweb_cli.schemas.info.rating import ContentRating, Rating
+
+from .console import console
 
 THOUSAND_THRESHOLD = 1000
 
