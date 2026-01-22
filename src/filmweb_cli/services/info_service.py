@@ -7,6 +7,7 @@ from filmweb_cli.client import FilmwebClient
 from filmweb_cli.schemas.info.content_info import FilmInfo, FullDescription, GameInfo, SeriesInfo
 from filmweb_cli.schemas.info.people_characters_info import CharacterContentResponse, CharacterInfo, PersonInfo
 from filmweb_cli.schemas.info.rating import ContentRating, Rating
+from filmweb_cli.schemas.info.worlds import WorldInfo
 
 ContentPreview = Annotated[FilmInfo | SeriesInfo | GameInfo, Field(discriminator="entity_name")]
 CONTENT_PREVIEW_ADAPTER = TypeAdapter(ContentPreview)
@@ -106,3 +107,7 @@ class InfoService:
                 titles_dict[category].append(title)
 
         response.known_for_titles = titles_dict
+
+    async def get_world_preview(self, world_id: int) -> WorldInfo:
+        world_response = await self.client.get(f"/world/{world_id}/preview")
+        return WorldInfo.model_validate(world_response.json())
