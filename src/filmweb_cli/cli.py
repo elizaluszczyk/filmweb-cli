@@ -9,6 +9,7 @@ from .display.content_preview import print_content_preview
 from .display.people_preview import print_person_preview
 from .display.search import print_search_results
 from .display.vod import print_where_to_watch, print_where_to_watch_compact
+from .display.worlds_preview import print_world_preview
 from .schemas.vod.vod_providers import WhereToWatch
 from .services.info_service import InfoService
 from .services.search_service import SearchService
@@ -19,7 +20,7 @@ if TYPE_CHECKING:
 
     from .display.search import Displayable
 
-VALID_CONTENT_TYPES = {"film", "series", "game", "person", "character"}
+VALID_CONTENT_TYPES = {"film", "series", "game", "person", "character", "world"}
 MEDIA_TYPES = {"film", "series", "game"}
 VOD_TYPES = {"film", "series"}
 
@@ -120,6 +121,10 @@ def show_info(client: FilmwebClient, content_id: str, *, full: bool) -> None:
 
         character_info, content_info = asyncio.run(fetch_character_info())
         print_character_preview(character_info, content_info)
+
+    elif parsed_type == "world":
+        person_info = asyncio.run(info_service.get_world_preview(parsed_id))
+        print_world_preview(person_info)
 
     else:
         click.echo(f"Unsupported content type: {parsed_type}")
