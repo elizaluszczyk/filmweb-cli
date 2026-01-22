@@ -16,7 +16,7 @@ dynamic = ["dependencies"]
 
 
 [project.scripts]
-filmweb-cli = "filmweb_cli.cli:main"
+filmweb = "filmweb_cli.cli:main"
 
 
 [tool.setuptools]
