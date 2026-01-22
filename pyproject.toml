@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "filmweb-cli"
 version = "0.0.1"
-description = "A Python package that does awesome things"
+description = "A command-line interface for Filmweb.pl."
 authors = [
     {name = "Eliza Łuszczyk", email = "eliza.luszczyk@gmail.com"}
 ]
