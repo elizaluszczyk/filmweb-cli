@@ -38,6 +38,9 @@ class InfoService:
 
     async def get_full_description(self, content_id: int) -> FullDescription:
         description_response = await self.client.get(f"/film/{content_id}/description")
+        if description_response.status_code == NO_CONTENT_RESPONSE:
+            return None
+
         return FullDescription.model_validate(description_response.json())
 
     async def get_person_preview(self, person_id: int) -> PersonInfo:

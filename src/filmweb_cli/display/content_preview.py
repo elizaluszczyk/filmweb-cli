@@ -41,7 +41,7 @@ def print_content_preview(
     if info.main_cast:
         console.print(f"[bold]Main cast:[/bold] {_join_names(info.main_cast)}")
 
-    if full_desc:
+    if full_desc and description:
         console.print()
         clean_full_description = " ".join(description.text.split())
         console.print(clean_full_description)
