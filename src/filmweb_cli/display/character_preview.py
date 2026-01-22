@@ -19,7 +19,7 @@ def print_character_preview(info: CharacterInfo, content_info: CharacterContentR
     )
 
     if content_info.known_for_titles:
-        console.print("[bold green]You can see in:[/bold green]")
+        console.print("[bold green]You can see in:[/bold green]", end="")
 
         for category, titles in content_info.known_for_titles.items():
             console.print(f"\n[dim cyan]{prettify_camel_case(category)}[/dim cyan]")
