@@ -10,7 +10,8 @@ from .display.people_preview import print_person_preview
 from .display.search import print_search_results
 from .display.vod import print_where_to_watch, print_where_to_watch_compact
 from .display.worlds_preview import print_world_preview
-from .exceptions.exceptions import ContentNotFoundError, InvalidContentError, InvalidIdTypeException
+from .exceptions.exceptions import ContentNotFoundError, InvalidContentError, InvalidIdPrefixError, InvalidIdTypeError
+from .filmweb_types import ValidTypes
 from .schemas.vod.vod_providers import WhereToWatch
 from .services.info_service import InfoService
 from .services.search_service import SearchService
@@ -21,9 +22,8 @@ if TYPE_CHECKING:
 
     from .display.search import Displayable
 
-VALID_CONTENT_TYPES = {"film", "series", "game", "person", "character", "world"}
-MEDIA_TYPES = {"film", "series", "game"}
-VOD_TYPES = {"film", "series"}
+MEDIA_TYPES = {ValidTypes.FILM, ValidTypes.SERIAL, ValidTypes.GAME}
+VOD_TYPES = {ValidTypes.FILM, ValidTypes.SERIAL}
 
 
 @click.group()
@@ -42,19 +42,19 @@ def search(client: FilmwebClient, query: str, *, raw: bool) -> None:
 
     if raw:
         for type_prefix, category, items in [
-            ("film", "FILM", search_results.get_films()),
-            ("series", "SERIES", search_results.get_series()),
-            ("game", "GAME", search_results.get_games()),
-            ("character", "CHARACTER", search_results.get_characters()),
-            ("person", "PERSON", search_results.get_movie_people()),
-            ("world", "WORLD", search_results.get_worlds()),
+            (ValidTypes.FILM.value, "FILM", search_results.get_films()),
+            (ValidTypes.SERIAL.value, "SERIAL", search_results.get_series()),
+            (ValidTypes.GAME.value, "GAME", search_results.get_games()),
+            (ValidTypes.CHARACTER.value, "CHARACTER", search_results.get_characters()),
+            (ValidTypes.PERSON.value, "PERSON", search_results.get_movie_people()),
+            (ValidTypes.WORLD.value, "WORLD", search_results.get_worlds()),
         ]:
             for item in items:
                 click.echo(f"{type_prefix}:{item.get_id()}\t[{category}] {item.display_name()}")
     else:
         categories: list[tuple[str, Sequence[Displayable]]] = [
             ("FILMS", search_results.get_films()),
-            ("SERIES", search_results.get_series()),
+            ("SERIAL", search_results.get_series()),
             ("GAMES", search_results.get_games()),
             ("CHARACTERS", search_results.get_characters()),
             ("PEOPLE", search_results.get_movie_people()),
@@ -72,7 +72,7 @@ def show_info(client: FilmwebClient, content_id: str, *, full: bool) -> None:
 
     try:
         parsed_type, parsed_id = _parse_content_input(content_id)
-    except InvalidIdTypeException as e:
+    except (InvalidIdTypeError, InvalidIdPrefixError) as e:
         click.echo(e, err=True)
         raise SystemExit(1) from e
 
@@ -90,15 +90,15 @@ def show_info(client: FilmwebClient, content_id: str, *, full: bool) -> None:
                 full_desc=full,
             )
 
-        elif parsed_type == "person":
+        elif parsed_type == ValidTypes.PERSON:
             person_info = asyncio.run(info_service.get_person_preview(parsed_id))
             print_person_preview(person_info)
 
-        elif parsed_type == "character":
+        elif parsed_type == ValidTypes.CHARACTER:
             character_info, content_info = asyncio.run(_fetch_character_info(info_service, parsed_id))
             print_character_preview(character_info, content_info)
 
-        elif parsed_type == "world":
+        elif parsed_type == ValidTypes.WORLD:
             person_info = asyncio.run(info_service.get_world_preview(parsed_id))
             print_world_preview(person_info)
 
@@ -183,22 +183,24 @@ def show_vod_providers(client: FilmwebClient, content_id: str, *, compact: bool)
         raise SystemExit(1) from e
 
 
-def _parse_content_input(content_id: str) -> tuple[str, int]:
+def _parse_content_input(content_id: str) -> tuple[ValidTypes, int]:
     if ":" in content_id:
         type_prefix, numeric_id = content_id.split(":", 1)
 
-        if type_prefix not in VALID_CONTENT_TYPES:
-            click.echo(f"Unknkown prefix: {type_prefix}.")
-            click.echo(f"Available: {', '.join(VALID_CONTENT_TYPES)}")
-            raise SystemExit(1)
+        try:
+            prefix = ValidTypes(type_prefix)
+        except ValueError as err:
+            valid_types = ", ".join([t.value for t in ValidTypes])
+            msg = f"Invalid prefix: {type_prefix}. Available: {valid_types}"
+            raise InvalidIdPrefixError(msg) from err
 
         if not numeric_id.isdecimal():
             msg = f"Invalid id type: {numeric_id} should be a number"
-            raise InvalidIdTypeException(msg)
+            raise InvalidIdTypeError(msg)
 
-        return type_prefix, int(numeric_id)
+        return prefix, int(numeric_id)
 
-    return "film", int(content_id)
+    return ValidTypes.FILM, int(content_id)
 
 
 if __name__ == "__main__":

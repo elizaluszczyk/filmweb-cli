@@ -2,14 +2,14 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field, model_validator
 
+from filmweb_cli.filmweb_types import ValidTypes
+
 from .hits import SearchCharacterHit, SearchFilmHit, SearchGameHit, SearchPersonHit, SearchSeriesHit, SearchWorldHit
 
 SearchResult = Annotated[
     SearchFilmHit | SearchSeriesHit | SearchGameHit | SearchCharacterHit | SearchPersonHit | SearchWorldHit,
     Field(discriminator="type"),
 ]
-
-ALLOWED_TYPES = {"film", "serial", "game", "person", "character", "world"}
 
 
 class SearchResponse(BaseModel):
@@ -20,9 +20,10 @@ class SearchResponse(BaseModel):
     @classmethod
     def filter_unknown_types(cls, data: dict) -> dict:
         if "searchHits" in data:
+            allowed_types = {t.value for t in ValidTypes}
             data["searchHits"] = [
                 hit for hit in data["searchHits"]
-                if hit.get("type") in ALLOWED_TYPES
+                if hit.get("type") in allowed_types
             ]
         return data
 

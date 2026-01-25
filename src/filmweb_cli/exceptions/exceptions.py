@@ -10,5 +10,9 @@ class InvalidContentError(FilmwebError):
     pass
 
 
-class InvalidIdTypeException(FilmwebError):
+class InvalidIdTypeError(FilmwebError):
+    pass
+
+
+class InvalidIdPrefixError(FilmwebError):
     pass
