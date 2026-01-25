@@ -50,6 +50,8 @@ def print_content_preview(
         clean_description = " ".join(info.description.split())
         console.print(clean_description)
 
+    console.print()
+
 
 def _format_count(count: int) -> str:
     return f"{count / 1000:.0f}k ratings" if count >= THOUSAND_THRESHOLD else str(count)

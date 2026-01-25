@@ -8,8 +8,6 @@ def print_where_to_watch(where_to_watch_list: list[WhereToWatch]) -> None:
         console.print("[dim]No streaming information available.[/dim]")
         return
 
-    console.print()
-
     subscription, rent, buy, free = _group_providers(where_to_watch_list)
 
     def print_category_with_price(title: str, style: str, items: dict[str, list[int]]) -> None:
@@ -49,8 +47,6 @@ def print_where_to_watch_compact(where_to_watch_list: list[WhereToWatch]) -> Non
     if not where_to_watch_list:
         console.print("[dim]No streaming information available.[/dim]")
         return
-
-    console.print()
 
     subscription, rent, buy, free = _group_providers(where_to_watch_list)
 
