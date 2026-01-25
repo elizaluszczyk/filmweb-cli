@@ -8,3 +8,7 @@ class ContentNotFoundError(FilmwebError):
 
 class InvalidContentError(FilmwebError):
     pass
+
+
+class InvalidIdTypeException(FilmwebError):
+    pass

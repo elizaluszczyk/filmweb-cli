@@ -19,14 +19,14 @@ class InfoService:
     def __init__(self, client: FilmwebClient) -> None:
         self.client = client
 
-    async def get_content_preview(self, content_id: int | str) -> ContentPreview:
+    async def get_content_preview(self, content_id: int) -> ContentPreview:
         info_response = await self.client.get(f"/film/{content_id}/preview")
 
         self._validate_response(info_response, content_id)
 
         return CONTENT_PREVIEW_ADAPTER.validate_python(info_response.json())
 
-    async def get_content_rating(self, content_id: int | str) -> ContentRating | None:
+    async def get_content_rating(self, content_id: int) -> ContentRating | None:
         rating_response = await self.client.get(f"/film/{content_id}/rating")
 
         if not self._validate_response(rating_response, content_id, allow_missing=True):
@@ -34,7 +34,7 @@ class InfoService:
 
         return ContentRating.model_validate(rating_response.json())
 
-    async def get_critics_content_rating(self, content_id: int | str) -> Rating | None:
+    async def get_critics_content_rating(self, content_id: int) -> Rating | None:
         critics_rating_response = await self.client.get(f"/film/{content_id}/critics/rating")
 
         if not self._validate_response(critics_rating_response, content_id, allow_missing=True):
@@ -42,7 +42,7 @@ class InfoService:
 
         return Rating.model_validate(critics_rating_response.json())
 
-    async def get_full_description(self, content_id: int | str) -> FullDescription:
+    async def get_full_description(self, content_id: int) -> FullDescription | None:
         description_response = await self.client.get(f"/film/{content_id}/description")
 
         if not self._validate_response(description_response, content_id, allow_missing=True):
@@ -50,7 +50,7 @@ class InfoService:
 
         return FullDescription.model_validate(description_response.json())
 
-    async def get_person_preview(self, person_id: int | str) -> PersonInfo:
+    async def get_person_preview(self, person_id: int) -> PersonInfo:
         person_raw_response = await self.client.get(f"/person/{person_id}/preview")
 
         self._validate_response(person_raw_response, person_id)
@@ -78,14 +78,14 @@ class InfoService:
 
         response.known_for_titles = titles
 
-    async def get_character_preview(self, character_id: int | str) -> CharacterInfo:
+    async def get_character_preview(self, character_id: int) -> CharacterInfo:
         character_response = await self.client.get(f"/character/{character_id}/preview")
 
         self._validate_response(character_response, character_id)
 
         return CharacterInfo.model_validate(character_response.json())
 
-    async def get_character_content(self, character_id: int | str) -> CharacterContentResponse:
+    async def get_character_content(self, character_id: int) -> CharacterContentResponse:
         content_raw_response = await self.client.get_ajax(f"/character/filmIds/{character_id}")
         response = CharacterContentResponse.model_validate(content_raw_response.json())
 
@@ -120,7 +120,7 @@ class InfoService:
 
         response.known_for_titles = titles_dict
 
-    async def get_world_preview(self, world_id: int | str) -> WorldInfo:
+    async def get_world_preview(self, world_id: int) -> WorldInfo:
         world_response = await self.client.get(f"/world/{world_id}/preview")
 
         self._validate_response(world_response, world_id)
@@ -128,7 +128,7 @@ class InfoService:
         return WorldInfo.model_validate(world_response.json())
 
     @staticmethod
-    def _validate_response(response: httpx.Response, resource_id: int | str, *, allow_missing: bool = False) -> bool:
+    def _validate_response(response: httpx.Response, resource_id: int, *, allow_missing: bool = False) -> bool:
         if response.status_code == httpx.codes.OK:
             return True
 

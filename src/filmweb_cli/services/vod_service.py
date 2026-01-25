@@ -17,7 +17,7 @@ class VodService:
         vod_response = await self.client.get("/vod/providers/list")
         return VOD_ADAPTER.validate_python(vod_response.json())
 
-    async def get_content_vod_providers(self, content_id: int | str) -> list[ContentVodProvider]:
+    async def get_content_vod_providers(self, content_id: int) -> list[ContentVodProvider]:
         content_vod_response = await self.client.get(f"/vod/film/{content_id}/providers/list")
 
         self._validate_response(content_vod_response, content_id)
@@ -25,7 +25,7 @@ class VodService:
         return CONTENT_VOD_ADAPTER.validate_python(content_vod_response.json())
 
     @staticmethod
-    def _validate_response(response: httpx.Response, resource_id: int | str) -> bool:
+    def _validate_response(response: httpx.Response, resource_id: int) -> bool:
         if response.status_code == httpx.codes.OK:
             return True
 

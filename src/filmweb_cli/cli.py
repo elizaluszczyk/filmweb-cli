@@ -10,7 +10,7 @@ from .display.people_preview import print_person_preview
 from .display.search import print_search_results
 from .display.vod import print_where_to_watch, print_where_to_watch_compact
 from .display.worlds_preview import print_world_preview
-from .exceptions.exceptions import ContentNotFoundError, InvalidContentError
+from .exceptions.exceptions import ContentNotFoundError, InvalidContentError, InvalidIdTypeException
 from .schemas.vod.vod_providers import WhereToWatch
 from .services.info_service import InfoService
 from .services.search_service import SearchService
@@ -72,6 +72,11 @@ def show_info(client: FilmwebClient, content_id: str, *, full: bool) -> None:
 
     try:
         parsed_type, parsed_id = _parse_content_input(content_id)
+    except InvalidIdTypeException as e:
+        click.echo(e, err=True)
+        raise SystemExit(1) from e
+
+    try:
         if parsed_type in MEDIA_TYPES:
             content_info, rating_info, critics_rating_info, full_description_info = asyncio.run(
                 _fetch_media_info(info_service, parsed_id, full=full),
@@ -178,7 +183,7 @@ def show_vod_providers(client: FilmwebClient, content_id: str, *, compact: bool)
         raise SystemExit(1) from e
 
 
-def _parse_content_input(content_id: str) -> tuple[str, int | str]:
+def _parse_content_input(content_id: str) -> tuple[str, int]:
     if ":" in content_id:
         type_prefix, numeric_id = content_id.split(":", 1)
 
@@ -187,9 +192,13 @@ def _parse_content_input(content_id: str) -> tuple[str, int | str]:
             click.echo(f"Available: {', '.join(VALID_CONTENT_TYPES)}")
             raise SystemExit(1)
 
-        return type_prefix, numeric_id
+        if not numeric_id.isdecimal():
+            msg = f"Invalid id type: {numeric_id} should be a number"
+            raise InvalidIdTypeException(msg)
 
-    return "film", content_id
+        return type_prefix, int(numeric_id)
+
+    return "film", int(content_id)
 
 
 if __name__ == "__main__":
