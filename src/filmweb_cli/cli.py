@@ -73,27 +73,9 @@ def show_info(client: FilmwebClient, content_id: str, *, full: bool) -> None:
     try:
         parsed_type, parsed_id = _parse_content_input(content_id)
         if parsed_type in MEDIA_TYPES:
-            async def fetch_media_info() -> tuple:
-                tasks = [
-                    info_service.get_content_preview(parsed_id),
-                    info_service.get_content_rating(parsed_id),
-                    info_service.get_critics_content_rating(parsed_id),
-                ]
-
-                if full:
-                    tasks.append(info_service.get_full_description(parsed_id))
-
-                results = await asyncio.gather(*tasks)
-
-                preview = results[0]
-                rating = results[1]
-                critics = results[2]
-
-                desc = results[3] if full else None
-
-                return preview, rating, critics, desc
-
-            content_info, rating_info, critics_rating_info, full_description_info = asyncio.run(fetch_media_info())
+            content_info, rating_info, critics_rating_info, full_description_info = asyncio.run(
+                _fetch_media_info(info_service, parsed_id, full=full),
+            )
 
             print_content_preview(
                 content_info,
@@ -108,20 +90,7 @@ def show_info(client: FilmwebClient, content_id: str, *, full: bool) -> None:
             print_person_preview(person_info)
 
         elif parsed_type == "character":
-            async def fetch_character_info() -> tuple:
-                tasks = [
-                    info_service.get_character_preview(parsed_id),
-                    info_service.get_character_content(parsed_id),
-                ]
-
-                results = await asyncio.gather(*tasks)
-
-                preview = results[0]
-                content = results[1]
-
-                return preview, content
-
-            character_info, content_info = asyncio.run(fetch_character_info())
+            character_info, content_info = asyncio.run(_fetch_character_info(info_service, parsed_id))
             print_character_preview(character_info, content_info)
 
         elif parsed_type == "world":
@@ -138,6 +107,35 @@ def show_info(client: FilmwebClient, content_id: str, *, full: bool) -> None:
     except InvalidContentError as e:
         click.echo(e, err=True)
         raise SystemExit(1) from e
+
+
+async def _fetch_media_info(info_service: InfoService, content_id: int, *, full: bool) -> tuple:
+    desc_task = None
+
+    async with asyncio.TaskGroup() as tg:
+        preview_task = tg.create_task(info_service.get_content_preview(content_id))
+        rating_task = tg.create_task(info_service.get_content_rating(content_id))
+        critics_rating_task = tg.create_task(info_service.get_critics_content_rating(content_id))
+
+        if full:
+            desc_task = tg.create_task(info_service.get_full_description(content_id))
+
+    desc = desc_task.result() if desc_task is not None else None
+
+    return (
+        preview_task.result(),
+        rating_task.result(),
+        critics_rating_task.result(),
+        desc,
+    )
+
+
+async def _fetch_character_info(info_service: InfoService, character_id: int) -> tuple:
+    async with asyncio.TaskGroup() as tg:
+        preview_task = tg.create_task(info_service.get_character_preview(character_id))
+        content_task = tg.create_task(info_service.get_character_content(character_id))
+
+    return (preview_task.result(), content_task.result())
 
 
 @main.command("vod")
