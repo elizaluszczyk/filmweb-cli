@@ -166,18 +166,12 @@ def _handle_exception_group(eg: ExceptionGroup) -> None:
 def show_vod_providers(client: FilmwebClient, content_id: str, *, compact: bool) -> None:
     try:
         parsed_type, parsed_id = _parse_content_input(content_id)
-
         if parsed_type not in VOD_TYPES:
             raise SystemExit(0)
 
-        async def fetch_info() -> tuple:
-            vod_service = VodService(client)
-            return await asyncio.gather(
-                vod_service.get_vod_providers(),
-                vod_service.get_content_vod_providers(parsed_id),
-            )
+        vod_service = VodService(client)
 
-        vod_providers, content_vod_providers = asyncio.run(fetch_info())
+        vod_providers, content_vod_providers = asyncio.run(_fetch_vod_info(vod_service, parsed_id))
 
         vod_providers_by_id = {p.id: p for p in vod_providers}
 
@@ -197,6 +191,14 @@ def show_vod_providers(client: FilmwebClient, content_id: str, *, compact: bool)
     except InvalidContentError as e:
         click.echo(e, err=True)
         raise SystemExit(1) from e
+
+
+async def _fetch_vod_info(vod_service: VodService, content_id: int) -> tuple:
+    async with asyncio.TaskGroup() as tg:
+        vod_task = tg.create_task(vod_service.get_vod_providers())
+        content_vod_task = tg.create_task(vod_service.get_content_vod_providers(content_id))
+
+    return (vod_task.result(), content_vod_task.result())
 
 
 def _parse_content_input(content_id: str) -> tuple[ValidTypes, int]:
