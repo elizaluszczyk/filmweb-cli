@@ -1,21 +1,20 @@
 import asyncio
 from typing import Annotated
 
-import httpx
 from pydantic import Field, TypeAdapter
 
 from filmweb_cli.client import FilmwebClient
-from filmweb_cli.exceptions.exceptions import ContentNotFoundError, InvalidContentError
 from filmweb_cli.schemas.info.content_info import FilmInfo, FullDescription, GameInfo, SeriesInfo
 from filmweb_cli.schemas.info.people_characters_info import CharacterContentResponse, CharacterInfo, PersonInfo
 from filmweb_cli.schemas.info.rating import ContentRating, Rating
 from filmweb_cli.schemas.info.worlds import WorldInfo
+from filmweb_cli.services.base_service import BaseService
 
 ContentPreview = Annotated[FilmInfo | SeriesInfo | GameInfo, Field(discriminator="entity_name")]
 CONTENT_PREVIEW_ADAPTER = TypeAdapter(ContentPreview)
 
 
-class InfoService:
+class InfoService(BaseService):
     def __init__(self, client: FilmwebClient) -> None:
         self.client = client
 
@@ -126,28 +125,3 @@ class InfoService:
         self._validate_response(world_response, world_id)
 
         return WorldInfo.model_validate(world_response.json())
-
-    @staticmethod
-    def _validate_response(response: httpx.Response, resource_id: int, *, allow_missing: bool = False) -> bool:
-        if response.status_code == httpx.codes.OK:
-            return True
-
-        if response.status_code == httpx.codes.NO_CONTENT:
-            if allow_missing:
-                return False
-
-            msg = f"Content not found for id: {resource_id}"
-            raise ContentNotFoundError(msg)
-
-        if response.status_code == httpx.codes.BAD_REQUEST:
-            try:
-                data = response.json()
-                error_msg = data.get("message", "Type mismatch or malformed request")
-            except (ValueError, AttributeError):
-                error_msg = "Invalid request (could not parse error body)"
-
-            msg = f"Filmweb API error ({resource_id}): {error_msg}"
-            raise InvalidContentError(msg)
-
-        response.raise_for_status()
-        return True
