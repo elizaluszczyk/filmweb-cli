@@ -106,6 +106,8 @@ def show_info(client: FilmwebClient, content_id: str, *, full: bool) -> None:
             click.echo(f"Unsupported content type: {parsed_type}")
             raise SystemExit(1)
 
+    except ExceptionGroup as eg:
+        _handle_exception_group(eg)
     except ContentNotFoundError as e:
         click.echo(e, err=True)
         raise SystemExit(1) from e
@@ -141,6 +143,20 @@ async def _fetch_character_info(info_service: InfoService, character_id: int) ->
         content_task = tg.create_task(info_service.get_character_content(character_id))
 
     return (preview_task.result(), content_task.result())
+
+
+def _handle_exception_group(eg: ExceptionGroup) -> None:
+    expected_errors, unexpected_errors = eg.split(
+        lambda e: isinstance(e, (ContentNotFoundError, InvalidContentError)),
+    )
+
+    if unexpected_errors:
+        raise unexpected_errors from eg
+
+    if expected_errors:
+        exc = expected_errors.exceptions[0]
+        click.echo(exc, err=True)
+        raise SystemExit(1) from exc
 
 
 @main.command("vod")
