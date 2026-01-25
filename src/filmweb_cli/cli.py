@@ -145,34 +145,39 @@ def show_info(client: FilmwebClient, content_id: str, *, full: bool) -> None:
 @click.option("--compact", "-c", is_flag=True, hidden=True, help="Compact display of vod providers")
 @click.pass_obj
 def show_vod_providers(client: FilmwebClient, content_id: str, *, compact: bool) -> None:
-    parsed_type, parsed_id = _parse_content_input(content_id)
+    try:
+        parsed_type, parsed_id = _parse_content_input(content_id)
 
-    if parsed_type not in VOD_TYPES:
-        raise SystemExit(0)
+        if parsed_type not in VOD_TYPES:
+            raise SystemExit(0)
 
-    async def fetch_info() -> tuple:
-        vod_service = VodService(client)
-        return await asyncio.gather(
-            vod_service.get_vod_providers(),
-            vod_service.get_content_vod_providers(parsed_id),
-        )
+        async def fetch_info() -> tuple:
+            vod_service = VodService(client)
+            return await asyncio.gather(
+                vod_service.get_vod_providers(),
+                vod_service.get_content_vod_providers(parsed_id),
+            )
 
-    vod_providers, content_vod_providers = asyncio.run(fetch_info())
+        vod_providers, content_vod_providers = asyncio.run(fetch_info())
 
-    vod_providers_by_id = {p.id: p for p in vod_providers}
+        vod_providers_by_id = {p.id: p for p in vod_providers}
 
-    where_to_watch_list: list[WhereToWatch] = [
-        WhereToWatch(
-            content=cp,
-            provider=vod_providers_by_id.get(cp.vod_provider),
-        )
-        for cp in content_vod_providers
-    ]
+        where_to_watch_list: list[WhereToWatch] = [
+            WhereToWatch(
+                content=cp,
+                provider=vod_providers_by_id.get(cp.vod_provider),
+            )
+            for cp in content_vod_providers
+        ]
 
-    if compact:
-        print_where_to_watch_compact(where_to_watch_list)
-    else:
-        print_where_to_watch(where_to_watch_list)
+        if compact:
+            print_where_to_watch_compact(where_to_watch_list)
+        else:
+            print_where_to_watch(where_to_watch_list)
+
+    except InvalidContentError as e:
+        click.echo(e, err=True)
+        raise SystemExit(1) from e
 
 
 def _parse_content_input(content_id: str) -> tuple[str, int | str]:
