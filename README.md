@@ -102,7 +102,7 @@ Check where to watch content online:
 filmweb vod 10059894
 ```
 
-[Vod image](.media/vod.png)
+![Vod image](.media/vod.png)
 
 Compact view:
 
@@ -110,7 +110,7 @@ Compact view:
 filmweb vod -c 10059894
 ```
 
-[Compact vod image](.media/vod_compact.png)
+![Compact vod image](.media/vod_compact.png)
 
 ## Requirements
 
