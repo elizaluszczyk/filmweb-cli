@@ -30,7 +30,7 @@ class CharacterType(BaseModel):
 class FigureInfo(BaseModel):
     id: int
     name: str
-    sex: int
+    sex: int | None = None
 
 
 class PersonInfo(FigureInfo):  # not all information from api response is parsed here
