@@ -112,6 +112,17 @@ filmweb vod -c 10059894
 
 ![Compact vod image](.media/vod_compact.png)
 
+### Top Roles
+
+Check the most important roles for a given production:
+
+```bash
+# Obsession
+filmweb top 10094250
+```
+
+![Top roles image](.media/top_roles.png)
+
 ## Requirements
 
 Runtime dependencies:
