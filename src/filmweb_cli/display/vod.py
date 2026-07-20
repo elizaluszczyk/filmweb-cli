@@ -6,6 +6,7 @@ from .console import console
 def print_where_to_watch(where_to_watch_list: list[WhereToWatch]) -> None:
     if not where_to_watch_list:
         console.print("[dim]No streaming information available.[/dim]")
+        console.print()
         return
 
     subscription, rent, buy, free = _group_providers(where_to_watch_list)
@@ -39,13 +40,11 @@ def print_where_to_watch(where_to_watch_list: list[WhereToWatch]) -> None:
     print_category_with_price("Buy", "magenta", buy)
     print_category("Free", "blue", free)
 
-    if not any([subscription, free, rent, buy]):
-        console.print("[dim]No streaming options found.[/dim]")
-
 
 def print_where_to_watch_compact(where_to_watch_list: list[WhereToWatch]) -> None:
     if not where_to_watch_list:
         console.print("[dim]No streaming information available.[/dim]")
+        console.print()
         return
 
     subscription, rent, buy, free = _group_providers(where_to_watch_list)
@@ -62,9 +61,6 @@ def print_where_to_watch_compact(where_to_watch_list: list[WhereToWatch]) -> Non
     print_category("Buy", "magenta", buy)
     print_category("Free", "blue", free)
     console.print()
-
-    if not any([subscription, free, rent, buy]):
-        console.print("[dim]No streaming options found.[/dim]")
 
 
 def _group_providers(
