@@ -241,7 +241,3 @@ def _parse_content_input(content_id: str) -> tuple[ValidTypes, int]:
         return prefix, int(numeric_id)
 
     return ValidTypes.FILM, int(content_id)
-
-
-if __name__ == "__main__":
-    main()
