@@ -8,12 +8,14 @@ from .display.character_preview import print_character_preview
 from .display.content_preview import print_content_preview
 from .display.people_preview import print_person_preview
 from .display.search import print_search_results
+from .display.top_roles_preview import print_top_roles_preview
 from .display.vod import print_where_to_watch, print_where_to_watch_compact
 from .display.worlds_preview import print_world_preview
 from .exceptions.exceptions import ContentNotFoundError, InvalidContentError, InvalidIdPrefixError, InvalidIdTypeError
 from .filmweb_types import ValidTypes
 from .schemas.vod.vod_providers import WhereToWatch
 from .services.info_service import InfoService
+from .services.ranking_service import RankingService
 from .services.search_service import SearchService
 from .services.vod_service import VodService
 
@@ -199,6 +201,26 @@ async def _fetch_vod_info(vod_service: VodService, content_id: int) -> tuple:
         content_vod_task = tg.create_task(vod_service.get_content_vod_providers(content_id))
 
     return (vod_task.result(), content_vod_task.result())
+
+
+@main.command("top")
+@click.argument("content_id")
+@click.pass_obj
+def show_top_roles(client: FilmwebClient, content_id: str) -> None:
+    try:
+        parsed_type, parsed_id = _parse_content_input(content_id)
+        if parsed_type not in MEDIA_TYPES:
+            raise SystemExit(0)
+
+        ranking_service = RankingService(client)
+
+        top_roles = asyncio.run(ranking_service.get_content_top_roles(parsed_id))
+
+        print_top_roles_preview(top_roles or [], max_value=10)
+
+    except InvalidContentError as e:
+        click.echo(e, err=True)
+        raise SystemExit(1) from e
 
 
 def _parse_content_input(content_id: str) -> tuple[ValidTypes, int]:
