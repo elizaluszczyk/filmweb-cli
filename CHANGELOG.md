@@ -1,3 +1,13 @@
+## [1.1.0]
+
+### Added
+
+- **Top roles** - display top roles/rankings for given content
+
+### Changed
+
+- **Dev tooling** - bumped pre-commit hooks, dev requirements, and GitHub Actions versions
+
 ## [1.0.0]
 
 ### Added
